@@ -1,0 +1,14 @@
+<div class="dialog-wrapper">
+    <div class="main-content_wrapper">
+        <dialog-content *ngFor="let dialogBox of dialogBoxes; let dialogIndex = index"
+        [start_time]="dialogBox.start_time"
+        [end_time]="dialogBox.end_time"
+        [index]="dialogIndex">
+        </dialog-content>
+    </div>
+    <div class="button-wrapper">
+        <button mat-mini-fab color="primary"
+        (click)="addDialogBox()" 
+        matTooltip="Add Dialog Box"><mat-icon>add</mat-icon></button>
+    </div>
+</div>
