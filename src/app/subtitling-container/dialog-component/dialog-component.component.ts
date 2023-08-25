@@ -12,7 +12,6 @@ import { DialogBox } from 'src/app/models/dialogBox.model';
 })
 export class DialogComponentComponent implements OnInit {
   public dialogBoxId: number = 1;
-  public fileContent$ = new BehaviorSubject<string>(null);
 
   public dialogBoxes: DialogBox[] = [{
     id: 1
@@ -88,35 +87,7 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
-  selectFile(event: Event): void {
-    let file = (event.target as HTMLInputElement).files[0];
-    this.readFile(file)
-    .then((data: string | ArrayBuffer) => {
-      this.fileContent$.next(data as string);
-      console.log(this.fileContent$.value);
-    })
-  }
-
-  private async readFile(file: File): Promise<string | ArrayBuffer> {
-    return new Promise<string | ArrayBuffer>((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        this.fileContent$.next(<string>reader.result);
-        return resolve((e.target as FileReader).result);
-      };
-      
-      reader.onerror = () => {
-        console.error(`FileReader failed on file ${file.name}.`);
-        return reject(null);
-      };
-
-      if (!file) {
-        console.error('No file to read.');
-        return reject(null);
-      }
-
-      reader.readAsText(file);
-    });
+  handleFileUpload(event: BehaviorSubject<string | ArrayBuffer>): void {
+    console.log(event.value)
   }
 }

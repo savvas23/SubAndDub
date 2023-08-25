@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatCardModule} from '@angular/material/card';
 import { DialogContentComponent } from './subtitling-container/dialog-component/dialog-content/dialog-content.component';
+import { ImportButtonComponent } from './shared/import-button/import-button.component';
 
 
 
@@ -25,7 +26,8 @@ import { DialogContentComponent } from './subtitling-container/dialog-component/
     VideoPlayerComponent,
     SubtitlingContainerComponent,
     DialogComponentComponent,
-    DialogContentComponent
+    DialogContentComponent,
+    ImportButtonComponent
   ],
   imports: [
     BrowserModule,
