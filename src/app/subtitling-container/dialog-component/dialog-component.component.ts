@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
-import { DialogBox } from 'src/app/models/dialogBox.model';
+import { DialogBox } from 'src/app/models/dialog-box.model';
+import { ImportModel } from 'src/app/models/import-sbv.model';
 
 @Component({
   selector: 'dialog-component',
@@ -35,13 +36,12 @@ export class DialogComponentComponent implements OnInit {
     return this.form.get(dialogBoxId + '-dialogBox') as FormGroup
   }
 
-  addDialogBox(): void {
+  addDialogBox(value?: ImportModel): void {
     this.dialogBoxId++;
-
     this.form.addControl(((this.dialogBoxId + '-dialogBox')), this.fb.group({
-      subtitles: this.fb.control(''),
-      start_time: this.fb.control(this.setStartTimeControlValue()),
-      end_time: this.fb.control(this.setEndTimeControlValue()),
+      subtitles: this.fb.control((value.start_time) ? value.subtitleText : ''),
+      start_time: this.fb.control((value.start_time) ? value.start_time : this.setStartTimeControlValue()),
+      end_time: this.fb.control((value.end_time) ? value.end_time : this.setStartTimeControlValue()),
     }));
 
     this.dialogBoxes.push({
@@ -88,6 +88,52 @@ export class DialogComponentComponent implements OnInit {
   }
 
   handleFileUpload(event: BehaviorSubject<string | ArrayBuffer>): void {
-    console.log(event.value)
+    let fileContent = event.value as string;
+    let cleanArray = this.cleanMultilineString(fileContent);
+    // clear all controls, to rebuild form
+    Object.keys(this.form.controls).forEach(control=> {
+      this.form.removeControl(control);
+    })
+    this.dialogBoxes = [];
+    this.dialogBoxId = 0;
+    for (let individualSub of cleanArray) {
+      this.addDialogBox(individualSub);
+    }
   }
+
+  cleanMultilineString(input: string): ImportModel[] {
+    const lines = input.trim().split('\n\n');
+    const result: ImportModel[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const parts = lines[i].split('\n');
+      const timestamp = parts[0].trim().split(',');
+
+      const start_time = this.formatTimestamp(timestamp[0]);
+      const end_time = this.formatTimestamp(timestamp[1]);
+
+      let subtitleText = "";
+      if (parts.length > 1) {
+        subtitleText = parts[1].trim();
+      }
+    
+      result.push({
+        start_time: start_time,
+        end_time: end_time,
+        subtitleText: subtitleText
+      });
+    }
+
+    return result;
+  }
+
+  formatTimestamp(timestamp: string): string {
+    const parts = timestamp.split(':');
+    for (let i = 0; i < parts.length; i++) {
+        if (parts[i].length === 1) {
+            parts[i] = '0' + parts[i];
+        }
+    }
+    return parts.join(':');
+}
 }

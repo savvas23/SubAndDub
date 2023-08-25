@@ -41,6 +41,7 @@ export class ImportButtonComponent {
       }
 
       reader.readAsText(file);
+      
     });
   }
 
