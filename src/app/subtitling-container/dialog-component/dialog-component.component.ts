@@ -36,12 +36,12 @@ export class DialogComponentComponent implements OnInit {
     return this.form.get(dialogBoxId + '-dialogBox') as FormGroup
   }
 
-  addDialogBox(value?: ImportModel): void {
+  addDialogBox(value: ImportModel = null): void {
     this.dialogBoxId++;
     this.form.addControl(((this.dialogBoxId + '-dialogBox')), this.fb.group({
-      subtitles: this.fb.control((value.start_time) ? value.subtitleText : ''),
-      start_time: this.fb.control((value.start_time) ? value.start_time : this.setStartTimeControlValue()),
-      end_time: this.fb.control((value.end_time) ? value.end_time : this.setStartTimeControlValue()),
+      subtitles: this.fb.control((value?.subtitleText) ? value.subtitleText : ''),
+      start_time: this.fb.control((value?.start_time) ? value.start_time : this.setStartTimeControlValue()),
+      end_time: this.fb.control((value?.end_time) ? value.end_time : this.setEndTimeControlValue()),
     }));
 
     this.dialogBoxes.push({
@@ -74,6 +74,7 @@ export class DialogComponentComponent implements OnInit {
       const prevEndTimeSplit = prevEndTime.split(':');
       let lastElement = parseInt(prevEndTimeSplit[2]); // Convert the last element to a number
       lastElement += 2; // Increase the last element by 2
+      console.log(lastElement)
       prevEndTimeSplit[2] = lastElement.toString(); //
   
       if (prevEndTimeSplit[2].length === 1) { //check if its 1 digit number and '0' infront to conform with time format
@@ -102,29 +103,29 @@ export class DialogComponentComponent implements OnInit {
   }
 
   cleanMultilineString(input: string): ImportModel[] {
-    const lines = input.trim().split('\n\n');
-    const result: ImportModel[] = [];
-    
+    const lines = input.trim().replace(/(\r|\r)/gm, '').split('\n');
+    const result = [];
+
+    const subtitleObjects = [];
+    let currentSubtitle: ImportModel = {start_time: '',end_time:'',subtitleText:''};
+  
     for (let i = 0; i < lines.length; i++) {
-      const parts = lines[i].split('\n');
-      const timestamp = parts[0].trim().split(',');
-
-      const start_time = this.formatTimestamp(timestamp[0]);
-      const end_time = this.formatTimestamp(timestamp[1]);
-
-      let subtitleText = "";
-      if (parts.length > 1) {
-        subtitleText = parts[1].trim();
+      const line = lines[i].trim();
+  
+      if (line.includes(":")) {
+        const [startTime, endTime] = line.split(",");
+        currentSubtitle = { 
+          start_time: this.formatTimestamp(startTime), 
+          end_time: this.formatTimestamp(endTime), 
+          subtitleText: ""
+         };
+        subtitleObjects.push(currentSubtitle);
+      } else if (line !== "") {
+        currentSubtitle.subtitleText += line + ' ';
       }
-    
-      result.push({
-        start_time: start_time,
-        end_time: end_time,
-        subtitleText: subtitleText
-      });
     }
 
-    return result;
+    return subtitleObjects;
   }
 
   formatTimestamp(timestamp: string): string {
