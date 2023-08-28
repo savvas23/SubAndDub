@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { YoutubeVideoService } from './video-service.service';
 
 @Component({
   selector: 'app-root',
@@ -11,8 +10,7 @@ export class AppComponent {
   form: FormGroup;
   youtubeVideoId: string;
 
-  constructor(private fb: FormBuilder, 
-    private videoService: YoutubeVideoService){}
+  constructor(private fb: FormBuilder){}
 
   ngOnInit(): void {
     const youtubeUrlPattern = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?(?=.*v=\w+)(?:\S+)?|embed\/\w+|v\/\w+|\S+)|youtu\.be\/\w+)(?:\S+)?$/;

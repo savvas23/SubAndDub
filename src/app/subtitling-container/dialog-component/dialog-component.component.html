@@ -9,8 +9,18 @@
     </div>
     <div class="button-wrapper">
         <button mat-mini-fab color="primary"
-        (click)="addDialogBox()" 
-        matTooltip="Add Dialog Box"><mat-icon>add</mat-icon></button>
-        <import-button (fileContentEmit)="handleFileUpload($event)" [acceptedFiles]="'.sbv'"></import-button>
+            (click)="addDialogBox()" 
+            matTooltip="Add Dialog Box"><mat-icon>add</mat-icon>
+        </button>
+        <button mat-mini-fab color="primary"
+            matTooltip="Translate your text"
+            [matMenuTriggerFor]="translateMenu">
+            <mat-icon>g_translate</mat-icon>
+        </button>
+            <mat-menu #translateMenu="matMenu">
+                <p mat-menu-item *ngFor="let language of (supportedLanguages$ | async)?.data?.languages">{{language.name}}</p>
+            </mat-menu>
+        <import-button (fileContentEmit)="handleFileUpload($event)" [acceptedFiles]="'.sbv'">
+        </import-button>
     </div>
 </div>

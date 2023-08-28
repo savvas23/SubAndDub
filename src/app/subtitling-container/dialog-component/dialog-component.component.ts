@@ -1,18 +1,28 @@
-import { ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/dialog-box.model';
+import { GoogleTranslateRequestObject } from 'src/app/models/google-translate-request';
 import { ImportModel } from 'src/app/models/import-sbv.model';
-
+import { GoogleTranslateService } from 'src/app/shared/services/googletranslate.service';
+import { UploadFileHandlerService } from 'src/app/shared/services/upload-file-handler.service';
+import {GoogleTranslateResponse} from 'src/app/models/google-translate-response'
+import { Language, Languages, SupportedLanguages } from 'src/app/models/google-supported-languages';
+import { MatMenuTrigger } from '@angular/material/menu';
 @Component({
   selector: 'dialog-component',
   templateUrl: './dialog-component.component.html',
   styleUrls: ['./dialog-component.component.css'],
+  providers: [UploadFileHandlerService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogComponentComponent implements OnInit {
   public dialogBoxId: number = 1;
+  public _supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
+  protected loading: boolean;
+  @ViewChild('translateMenu') translateMenu;
+  @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 
   public dialogBoxes: DialogBox[] = [{
     id: 1
@@ -20,7 +30,11 @@ export class DialogComponentComponent implements OnInit {
 
   public form: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  get supportedLanguages$(): Observable<SupportedLanguages> {
+    return this._supportedLanguages$;
+  }
+
+  constructor(private fb: FormBuilder, private fileService: UploadFileHandlerService, private google: GoogleTranslateService) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -29,7 +43,9 @@ export class DialogComponentComponent implements OnInit {
         start_time: this.fb.control('00:00:00.00'),
         end_time: this.fb.control('00:00:02.00'),
       }),
-    })
+    });
+
+    this.getSupportedLanguages();
   }
 
   getDialogControl(dialogBoxId: number): FormGroup {
@@ -74,7 +90,6 @@ export class DialogComponentComponent implements OnInit {
       const prevEndTimeSplit = prevEndTime.split(':');
       let lastElement = parseInt(prevEndTimeSplit[2]); // Convert the last element to a number
       lastElement += 2; // Increase the last element by 2
-      console.log(lastElement)
       prevEndTimeSplit[2] = lastElement.toString(); //
   
       if (prevEndTimeSplit[2].length === 1) { //check if its 1 digit number and '0' infront to conform with time format
@@ -88,9 +103,43 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
+  translateSubtitles(): void {
+    let translationObject: GoogleTranslateRequestObject = {
+      q: [],
+      target: 'el'
+    };
+    let controllersToChange = {
+      controlsName : []
+    };
+    Object.keys(this.form.controls).forEach(control=> {
+      const controlValue = this.form.get(control).get('subtitles').value;
+      if (controlValue) {
+        translationObject.q.push(controlValue)
+        controllersToChange.controlsName.push(control)
+      }
+    });
+
+    if (translationObject.q) {
+      this.google.translate(translationObject).subscribe((response: GoogleTranslateResponse) => {
+        console.log(response.data)
+      })
+    }
+  }
+
+  getSupportedLanguages(): void {
+    this.google.getSupportedLanguages()
+    .pipe(tap(() => {
+      this.loading = true;
+    }))
+    .subscribe((response: SupportedLanguages) => {
+      this._supportedLanguages$.next(response)
+      this.loading = false;
+    });
+  }
+
   handleFileUpload(event: BehaviorSubject<string | ArrayBuffer>): void {
     let fileContent = event.value as string;
-    let cleanArray = this.cleanMultilineString(fileContent);
+    let cleanArray = this.fileService.cleanMultilineString(fileContent);
     // clear all controls, to rebuild form
     Object.keys(this.form.controls).forEach(control=> {
       this.form.removeControl(control);
@@ -101,40 +150,4 @@ export class DialogComponentComponent implements OnInit {
       this.addDialogBox(individualSub);
     }
   }
-
-  cleanMultilineString(input: string): ImportModel[] {
-    const lines = input.trim().replace(/(\r|\r)/gm, '').split('\n');
-    const result = [];
-
-    const subtitleObjects = [];
-    let currentSubtitle: ImportModel = {start_time: '',end_time:'',subtitleText:''};
-  
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-  
-      if (line.includes(":")) {
-        const [startTime, endTime] = line.split(",");
-        currentSubtitle = { 
-          start_time: this.formatTimestamp(startTime), 
-          end_time: this.formatTimestamp(endTime), 
-          subtitleText: ""
-         };
-        subtitleObjects.push(currentSubtitle);
-      } else if (line !== "") {
-        currentSubtitle.subtitleText += line + ' ';
-      }
-    }
-
-    return subtitleObjects;
-  }
-
-  formatTimestamp(timestamp: string): string {
-    const parts = timestamp.split(':');
-    for (let i = 0; i < parts.length; i++) {
-        if (parts[i].length === 1) {
-            parts[i] = '0' + parts[i];
-        }
-    }
-    return parts.join(':');
-}
 }
