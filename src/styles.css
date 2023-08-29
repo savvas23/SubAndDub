@@ -17,3 +17,15 @@ body {
     height:8px;
     background-color: #3f51b5;
 }
+
+
+::-webkit-scrollbar
+{
+	width: 5px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+	background-color: #3f51b5;
+}

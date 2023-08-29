@@ -5,6 +5,10 @@
 }
 
 .main-content_wrapper {
+    overflow-y: auto;
+    padding-right:10px;
+    height: 75vh;
+    overflow-x: visible;
     margin-right:30px;
 }
 

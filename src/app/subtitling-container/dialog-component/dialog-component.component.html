@@ -18,7 +18,10 @@
             <mat-icon>g_translate</mat-icon>
         </button>
             <mat-menu #translateMenu="matMenu">
-                <p mat-menu-item *ngFor="let language of (supportedLanguages$ | async)?.data?.languages">{{language.name}}</p>
+                <p mat-menu-item *ngFor="let language of (supportedLanguages$ | async)?.data?.languages"
+                (click)="translateSubtitles(language.language)">
+                    {{language.name}}
+                </p>
             </mat-menu>
         <import-button (fileContentEmit)="handleFileUpload($event)" [acceptedFiles]="'.sbv'">
         </import-button>

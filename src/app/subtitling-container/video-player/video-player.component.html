@@ -1,6 +1,6 @@
 <mat-card>
     <mat-card-content>
-        <youtube-player [videoId]="videoId">
+        <youtube-player (ready)="playerLoaded($event)" [videoId]="videoId">
         </youtube-player>
     </mat-card-content>
 </mat-card>

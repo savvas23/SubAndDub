@@ -20,6 +20,8 @@ import { MatMenuTrigger } from '@angular/material/menu';
 export class DialogComponentComponent implements OnInit {
   public dialogBoxId: number = 1;
   public _supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
+  public _translatedText$: BehaviorSubject<GoogleTranslateResponse[]> = new BehaviorSubject<GoogleTranslateResponse[]>([]);
+
   protected loading: boolean;
   @ViewChild('translateMenu') translateMenu;
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
@@ -103,14 +105,15 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
-  translateSubtitles(): void {
+  translateSubtitles(targetLanguage: string): void {
     let translationObject: GoogleTranslateRequestObject = {
       q: [],
-      target: 'el'
+      target: targetLanguage
     };
     let controllersToChange = {
       controlsName : []
     };
+
     Object.keys(this.form.controls).forEach(control=> {
       const controlValue = this.form.get(control).get('subtitles').value;
       if (controlValue) {
@@ -118,10 +121,14 @@ export class DialogComponentComponent implements OnInit {
         controllersToChange.controlsName.push(control)
       }
     });
-
+    
     if (translationObject.q) {
-      this.google.translate(translationObject).subscribe((response: GoogleTranslateResponse) => {
-        console.log(response.data)
+      this.google.translate(translationObject).subscribe((response: GoogleTranslateResponse[]) => {
+        this._translatedText$.next(response);
+        if (this._translatedText$.value) {
+          controllersToChange.controlsName.forEach((control,index) => {
+          })
+        }
       })
     }
   }
