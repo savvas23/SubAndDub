@@ -8,7 +8,5 @@ import { Component, Input } from '@angular/core';
 export class SubtitlingContainerComponent {
   
 @Input() videoId: string;
-  test(event){
-    console.log
-  }
+
 }

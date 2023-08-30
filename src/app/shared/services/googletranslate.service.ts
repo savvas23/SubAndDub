@@ -4,9 +4,7 @@ import { map } from 'rxjs';
 import { GoogleTranslateRequestObject } from 'src/app/models/google-translate-request';
 import { GTRANSLATE_API_KEY } from 'src/config';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class GoogleTranslateService {
   constructor(private http: HttpClient) { }
 

@@ -1,8 +1,8 @@
 export interface GoogleTranslateResponse {
-    data: GoogleTranslatations[];
+    data: GoogleTranslations[];
 }
 
-export interface GoogleTranslatations {
+export interface GoogleTranslations {
     detectedSourceLanguage: string;
     translatedText: string;
 }

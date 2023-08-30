@@ -1,26 +1,26 @@
 import { ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/dialog-box.model';
 import { GoogleTranslateRequestObject } from 'src/app/models/google-translate-request';
 import { ImportModel } from 'src/app/models/import-sbv.model';
 import { GoogleTranslateService } from 'src/app/shared/services/googletranslate.service';
 import { UploadFileHandlerService } from 'src/app/shared/services/upload-file-handler.service';
-import {GoogleTranslateResponse} from 'src/app/models/google-translate-response'
-import { Language, Languages, SupportedLanguages } from 'src/app/models/google-supported-languages';
+import { GoogleTranslateResponse, GoogleTranslations} from 'src/app/models/google-translate-response'
+import { SupportedLanguages } from 'src/app/models/google-supported-languages';
 import { MatMenuTrigger } from '@angular/material/menu';
 @Component({
   selector: 'dialog-component',
   templateUrl: './dialog-component.component.html',
   styleUrls: ['./dialog-component.component.css'],
-  providers: [UploadFileHandlerService],
+  providers: [UploadFileHandlerService, GoogleTranslateService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogComponentComponent implements OnInit {
   public dialogBoxId: number = 1;
   public _supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
-  public _translatedText$: BehaviorSubject<GoogleTranslateResponse[]> = new BehaviorSubject<GoogleTranslateResponse[]>([]);
+  public _translatedText$: BehaviorSubject<GoogleTranslateResponse> = new BehaviorSubject<GoogleTranslateResponse>(null);
 
   protected loading: boolean;
   @ViewChild('translateMenu') translateMenu;
@@ -110,6 +110,7 @@ export class DialogComponentComponent implements OnInit {
       q: [],
       target: targetLanguage
     };
+
     let controllersToChange = {
       controlsName : []
     };
@@ -123,13 +124,16 @@ export class DialogComponentComponent implements OnInit {
     });
     
     if (translationObject.q) {
-      this.google.translate(translationObject).subscribe((response: GoogleTranslateResponse[]) => {
+      this.google.translate(translationObject).subscribe((response: GoogleTranslateResponse) => {
         this._translatedText$.next(response);
-        if (this._translatedText$.value) {
-          controllersToChange.controlsName.forEach((control,index) => {
-          })
-        }
-      })
+        let translationArray: GoogleTranslations[] = this._translatedText$.value.data['translations'];
+
+        if (translationArray) {
+          for (let i = 0; i < controllersToChange.controlsName.length; i++) {
+            const control = this.form.get(controllersToChange.controlsName[i]).get('subtitles');
+            control.setValue(translationArray[i].translatedText);
+          }
+        }});
     }
   }
 
