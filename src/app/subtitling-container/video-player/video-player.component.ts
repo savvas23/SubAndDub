@@ -21,8 +21,7 @@ export class VideoPlayerComponent implements OnInit {
     }
   }
 
-  playerLoaded(event): void {
-    console.log(event)
+  playerLoaded(): void {
     this.playerReady = true;
   }
 }

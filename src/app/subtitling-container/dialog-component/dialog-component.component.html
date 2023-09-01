@@ -4,7 +4,9 @@
         [dialogGroup]="getDialogControl(dialogBox.id)"
         [index]="dialogIndex"
         [dialogId]="dialogBox.id"
-        (deleteDialogBoxEvent)="deleteDialogBox($event)">
+        (deleteDialogBoxEvent)="deleteDialogBox($event)"
+        (startTimeValueValidation)="startTimeValidation($event)"
+        (endTimeValueValidation)="endTimeValidation($event)">
         </dialog-content>
     </div>
     <div class="button-wrapper">
@@ -18,10 +20,13 @@
             <mat-icon>g_translate</mat-icon>
         </button>
             <mat-menu #translateMenu="matMenu">
-                <p mat-menu-item *ngFor="let language of (supportedLanguages$ | async)?.data?.languages"
-                (click)="translateSubtitles(language.language)">
-                    {{language.name}}
-                </p>
+                <sd-loader *ngIf="loading; else loadingComplete"></sd-loader>
+                <ng-template #loadingComplete>
+                    <p mat-menu-item *ngFor="let language of (supportedLanguages$ | async)?.data?.languages"
+                    (click)="translateSubtitles(language.language)">
+                        {{language.name}}
+                    </p>
+                </ng-template>
             </mat-menu>
         <import-button (fileContentEmit)="handleFileUpload($event)" [acceptedFiles]="'.sbv'">
         </import-button>

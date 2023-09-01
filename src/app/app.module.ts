@@ -19,6 +19,8 @@ import { DialogContentComponent } from './subtitling-container/dialog-component/
 import { ImportButtonComponent } from './shared/import-button/import-button.component';
 import { HttpClientModule } from '@angular/common/http';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { LoaderComponent } from './shared/loader/loader.component';
 
 
 
@@ -30,7 +32,8 @@ import { MatMenuModule } from '@angular/material/menu';
     SubtitlingContainerComponent,
     DialogComponentComponent,
     DialogContentComponent,
-    ImportButtonComponent
+    ImportButtonComponent,
+    LoaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -46,7 +49,8 @@ import { MatMenuModule } from '@angular/material/menu';
     FlexLayoutModule,
     MatCardModule,
     HttpClientModule,
-    MatMenuModule
+    MatMenuModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

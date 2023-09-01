@@ -7,14 +7,15 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./dialog-content.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DialogContentComponent implements OnInit{
+export class DialogContentComponent {
   @Input() dialogGroup: FormGroup;
   @Input() index: number;
   @Input() dialogId: number;
   @Output() deleteDialogBoxEvent: EventEmitter<number> = new EventEmitter();
+  @Output() startTimeValueValidation: EventEmitter<TimeEmitterObject> = new EventEmitter();
+  @Output() endTimeValueValidation: EventEmitter<TimeEmitterObject> = new EventEmitter();
 
-  ngOnInit(): void {
-  }
+
 
   getDialogControl(control: string): FormControl {
     return this.dialogGroup.get(control) as FormControl
@@ -23,4 +24,27 @@ export class DialogContentComponent implements OnInit{
   deleteDialogBox(dialogId: number): void {
     this.deleteDialogBoxEvent.emit(dialogId);
   }
+
+  emitStartTimeValue(): void {
+    const EmitObject: TimeEmitterObject = {
+      id: this.dialogId,
+      value: this.getDialogControl('end_time').value
+    };
+    
+    this.startTimeValueValidation.emit(EmitObject);
+  }
+
+  emitEndTimeValue(): void {
+    const EmitObject: TimeEmitterObject = {
+      id: this.dialogId,
+      value: this.getDialogControl('end_time').value
+    };
+
+    this.endTimeValueValidation.emit(EmitObject);
+  }
+}
+
+export interface TimeEmitterObject {
+  id: number;
+  value: string;
 }

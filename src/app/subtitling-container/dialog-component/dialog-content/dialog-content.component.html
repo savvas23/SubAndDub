@@ -7,14 +7,14 @@
         <mat-form-field subscriptSizing="dynamic">
           <textarea matInput [formControl]="getDialogControl('subtitles')" type="text"></textarea>
         </mat-form-field>
-        <div fxLayout="column" fxFlex="25">
+        <div fxLayout="column" fxLayoutGap="10px" fxFlex="30">
           <mat-form-field subscriptSizing="dynamic">
             <mat-label>From:</mat-label>
-            <input matInput [formControl]="getDialogControl('start_time')" matTooltip="Hour:Minute:Seconds:Ms" type="time" step="0.1">
+            <input matInput (blur)="emitStartTimeValue()" [formControl]="getDialogControl('start_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
           </mat-form-field>
           <mat-form-field subscriptSizing="dynamic">
             <mat-label>To:</mat-label>
-            <input matInput [formControl]="getDialogControl('end_time')" matTooltip="Hour:Minute:Seconds:Ms" type="time" step="0.1">
+            <input matInput (blur)="emitEndTimeValue()" [formControl]="getDialogControl('end_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
           </mat-form-field>
         </div>
     </mat-card-content>
