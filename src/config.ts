@@ -1,1 +1,0 @@
-export const GTRANSLATE_API_KEY = 'API_KEY'
