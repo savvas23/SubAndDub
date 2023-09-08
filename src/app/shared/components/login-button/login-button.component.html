@@ -1,0 +1,12 @@
+<div *ngIf="(auth.user$ | async) as user; else login">
+    <button mat-raised-button (click)="auth.signOut()" >Logout</button>
+</div>
+<ng-template #login>
+    <div>
+        <button (click)="auth.googleSignin()" mat-raised-button>
+            <img width="20px" style="margin-top:5px; margin-right:8px" alt="Google sign-in" 
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/>    
+            Sign in with Google
+        </button>
+    </div>
+</ng-template>
