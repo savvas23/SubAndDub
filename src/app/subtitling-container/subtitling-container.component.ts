@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { AuthService } from '../shared/services/auth.service';
 
 @Component({
   selector: 'subtitling-container',
@@ -8,5 +9,5 @@ import { Component, Input } from '@angular/core';
 export class SubtitlingContainerComponent {
   
 @Input() videoId: string;
-
+  constructor(public auth: AuthService ) {}
 }

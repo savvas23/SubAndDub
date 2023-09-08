@@ -16,11 +16,24 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatCardModule} from '@angular/material/card';
 import { DialogContentComponent } from './subtitling-container/dialog-component/dialog-content/dialog-content.component';
-import { ImportButtonComponent } from './shared/import-button/import-button.component';
+import { ImportButtonComponent } from './shared/components/import-button/import-button.component';
 import { HttpClientModule } from '@angular/common/http';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import { LoaderComponent } from './shared/loader/loader.component';
+import { LoaderComponent } from './shared/components/loader/loader.component';
+import { MenuComponent } from './top-toolbar/menu/menu.component';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { environment } from 'src/environments/environment';
+import { LoginButtonComponent } from './shared/components/login-button/login-button.component';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import { VideoInitFormComponent } from './video-init-form/video-init-form.component';
+import { UserVideosComponent } from './subtitling-container/user-videos/user-videos.component';
+import {MatDividerModule} from '@angular/material/divider';
+import { HomeCardsComponent } from './shared/components/home-cards/home-cards.component';
 
 
 
@@ -34,6 +47,11 @@ import { LoaderComponent } from './shared/loader/loader.component';
     DialogContentComponent,
     ImportButtonComponent,
     LoaderComponent,
+    MenuComponent,
+    LoginButtonComponent,
+    VideoInitFormComponent,
+    UserVideosComponent,
+    HomeCardsComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,7 +68,14 @@ import { LoaderComponent } from './shared/loader/loader.component';
     MatCardModule,
     HttpClientModule,
     MatMenuModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFireAuthModule,
+    AngularFirestoreModule,
+    AngularFireStorageModule,
+    AngularFireDatabaseModule,
+    MatToolbarModule,
+    MatDividerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

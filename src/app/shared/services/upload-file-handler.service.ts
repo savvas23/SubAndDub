@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { ImportModel } from 'src/app/models/import-sbv.model';
+import { ImportModel } from 'src/app/models/general/import-sbv.model';
 
 @Injectable()
 export class UploadFileHandlerService {

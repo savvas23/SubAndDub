@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs';
-import { GoogleTranslateRequestObject } from 'src/app/models/google-translate-request';
+import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
 import { GTRANSLATE_API_KEY } from 'src/config';
 
 @Injectable()

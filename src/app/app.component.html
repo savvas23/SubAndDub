@@ -1,12 +1,14 @@
-<form [formGroup]="form" (submit)="onSubmit()">
-    <div class="url-wrapper">
-        <mat-form-field color="primary" class="form-field">
-            <mat-label>Enter YouTube URL</mat-label>
-            <input formControlName="youtubeUrl" matInput type="text">
-            <mat-hint>Enter the YouTube video URL which you want subtitles/dubbing for</mat-hint>
-            <mat-error>Invalid URL</mat-error>
-        </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">START</button>
+<app-menu></app-menu>
+<div class="main-view-login" *ngIf="!(auth.user$ | async)">
+    <div class="call-to-action_login">
+        <button (click)="auth.googleSignin()" mat-raised-button>
+            <img width="20px" style="margin-top:4px; margin-right:8px" alt="Google sign-in" 
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/>    
+            Sign in with Google
+        </button>
+        <h1 style="padding-top:15px;">For an optimal User Experience.</h1>
+        <h1>Get started right away!</h1>
     </div>
-</form>
-<subtitling-container *ngIf="youtubeVideoId" [videoId]="youtubeVideoId"></subtitling-container>
+</div>
+<home-cards></home-cards>
+<app-video-init-form *ngIf="(auth.user$ | async)"></app-video-init-form>

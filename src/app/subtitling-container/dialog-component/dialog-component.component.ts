@@ -1,15 +1,15 @@
 import { Component, OnInit,ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { DialogBox } from 'src/app/models/dialog-box.model';
-import { GoogleTranslateRequestObject } from 'src/app/models/google-translate-request';
-import { ImportModel } from 'src/app/models/import-sbv.model';
+import { DialogBox } from 'src/app/models/general/dialog-box.model';
+import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
+import { ImportModel } from 'src/app/models/general/import-sbv.model';
 import { GoogleTranslateService } from 'src/app/shared/services/googletranslate.service';
 import { UploadFileHandlerService } from 'src/app/shared/services/upload-file-handler.service';
-import { GoogleTranslateResponse, GoogleTranslations} from 'src/app/models/google-translate-response'
-import { SupportedLanguages } from 'src/app/models/google-supported-languages';
+import { GoogleTranslateResponse, GoogleTranslations} from 'src/app/models/google/google-translate-response'
+import { SupportedLanguages } from 'src/app/models/google/google-supported-languages';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { TimeFormat } from 'src/app/models/time-format.model';
+import { TimeFormat } from 'src/app/models/general/time-format.model';
 import { TimeEmitterObject } from './dialog-content/dialog-content.component';
 
 @Component({

@@ -1,14 +1,17 @@
-.mat-mdc-form-field {
-    min-width:550px;
-}
-
-.url-wrapper {
-    padding-top:10px;
+.main-view-login {
+    padding-top: 10px;
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
-.mdc-button {
-    margin:6px 0 0 16px;
-    height:42px
+.call-to-action_login {
+    padding-top:15px;
+    text-align:center;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.mdc-card {
+    flex-direction: row;
 }
