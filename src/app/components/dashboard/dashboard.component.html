@@ -1,0 +1,22 @@
+<div *ngIf="(user$ | async)" class="dashboard-wrapper">
+    <div class="dashboard-header">
+        <h1>My Videos</h1>
+        <button mat-mini-fab color="primary" 
+           (click)="openDialog()" matTooltip="Add New video"><mat-icon>add</mat-icon>
+    </button>
+    </div>
+    <div class="video-container">
+        <div class="no-video" *ngIf="!(userVideos$ | async); else videos">
+            <h3>No videos found, click on the button to get started!</h3>
+        </div>
+        <ng-template #videos>
+            <div class="" *ngFor="let videos of userVideos$ | async">
+                <video-card></video-card>
+            </div>
+        </ng-template>            
+    </div>
+</div>
+<div class="video-submission-form" *ngIf="isFormOpen">
+    <app-video-init-form class="video-init-form" *ngIf="isFormOpen">
+    </app-video-init-form>
+</div>

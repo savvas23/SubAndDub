@@ -14,7 +14,7 @@ import { DialogComponentComponent } from './subtitling-container/dialog-componen
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { DialogContentComponent } from './subtitling-container/dialog-component/dialog-content/dialog-content.component';
 import { ImportButtonComponent } from './shared/components/import-button/import-button.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -29,11 +29,15 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from 'src/environments/environment';
 import { LoginButtonComponent } from './shared/components/login-button/login-button.component';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import { VideoInitFormComponent } from './video-init-form/video-init-form.component';
+import { MatToolbarModule} from '@angular/material/toolbar';
+import { VideoInitFormComponent } from './components/video-add-form/video-init-form.component';
 import { UserVideosComponent } from './subtitling-container/user-videos/user-videos.component';
-import {MatDividerModule} from '@angular/material/divider';
+import { MatDividerModule} from '@angular/material/divider';
 import { HomeCardsComponent } from './shared/components/home-cards/home-cards.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { SignInComponent } from './components/sign-in/sign-in.component';
+import { MatDialogModule} from '@angular/material/dialog';
+import { VideoCardComponent } from './components/video-card/video-card.component';
 
 
 
@@ -52,6 +56,9 @@ import { HomeCardsComponent } from './shared/components/home-cards/home-cards.co
     VideoInitFormComponent,
     UserVideosComponent,
     HomeCardsComponent,
+    DashboardComponent,
+    SignInComponent,
+    VideoCardComponent,
   ],
   imports: [
     BrowserModule,
@@ -75,7 +82,8 @@ import { HomeCardsComponent } from './shared/components/home-cards/home-cards.co
     AngularFireStorageModule,
     AngularFireDatabaseModule,
     MatToolbarModule,
-    MatDividerModule
+    MatDividerModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

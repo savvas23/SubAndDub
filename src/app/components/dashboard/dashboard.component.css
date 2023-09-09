@@ -1,0 +1,23 @@
+.dashboard-wrapper {
+    display:flex;
+    flex-direction: column;
+    padding-top:100px;
+    padding-left:100px;
+    padding-right:100px;
+}
+
+.dashboard-header{
+    display:flex;
+    gap:30px;
+}
+
+.dashboard-header h1{
+    font-size:32px;
+}
+
+.video-container {
+    display:flex;
+    gap:30px;
+    margin-top:20px;
+}
+

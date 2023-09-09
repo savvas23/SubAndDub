@@ -1,0 +1,48 @@
+.yt-card {
+    width: 300px;
+    height: 300px;
+    font-family: sans-serif;
+    display: inline-block;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 10px;
+  }
+  .yt-card .thumb{
+    height: 56%;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .yt-card .thumb img {
+    width: 100%;
+    cursor: pointer;
+  }
+  .yt-card .details {
+    display: flex;
+    gap: 10px;
+  }
+  .yt-card .channel {
+    flex: 1;
+  }
+  .yt-card .channel img {
+    width: 100%;
+    border-radius: 50%;
+  }
+  .yt-card .info {
+    flex: 6;
+    font-size: 16px;
+    color: grey;
+  }
+  .yt-card .title a {
+    font-size: 18px;
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  .yt-card .title {
+    margin-bottom: 10px;
+  }
+  
+  .yt-card a {
+    color: grey;
+    text-decoration: none;
+  }

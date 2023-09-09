@@ -17,6 +17,11 @@ p {
     margin-bottom: 1.5em;
   }
   
+  .container {
+    display: flex;
+    gap:30px;
+  }
+  
   .card {
     max-width: 300px;
     min-height: 200px;
