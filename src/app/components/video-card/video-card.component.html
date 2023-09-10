@@ -1,22 +1,18 @@
 <div class="yt-card">
 	<div class="thumb">
-    <a href="https://www.facebook.com/RIRwebdesign" target="_blank">
-		<img src="https://www.pngitem.com/pimgs/m/181-1816302_google-png-transparent-background-google-png-download.png" preview="https://media0.giphy.com/media/MRDICUC5enJy8/giphy.gif"
-         /> </a>
+        <a [href]="'//youtube.com/watch?v=' + videoDetails?.id" target="_blank">
+            <img [src]="videoDetails?.snippet?.thumbnails?.medium.url">
+        </a>
 	</div>
 	<div class="details">
-		<div class="channel">
-			<a href="https://www.facebook.com/RIRwebdesign" target="_blank">
-				<img src="https://yt3.ggpht.com/a-/AOh14GiexIE43bYEeRmNi0_vURoHuRqUM5l5uKpsk22QrA=s88-c-k-c0xffffffff-no-rj-mo" />
-			</a>
-		</div>
 		<div class="info">
-			<div class="title"><a href="https://www.facebook.com/RIRwebdesign" target="_blank">Google Animation Doodle</a>
+			<div class="title" > {{ (videoDetails?.snippet?.title?.length > 50) ? (videoDetails?.snippet?.title | slice:0:50) + '...' : (videoDetails?.snippet?.title) }}
+
 			</div>
-			<div class="channel-name"><a href="https://www.facebook.com/RIRwebdesign" target="_blank">Rezowan Islam</a></div>
+			<div class="channel-name">{{videoDetails?.snippet?.channelTitle}}</div>
 			<div class="views">
-        <span id="views">200K views</span> · 
-        <span>8 month ago</span>
+        <span id="views">{{videoDetails?.statistics?.viewCount | number }} views</span> · 
+        <span>{{publishDate}} ago</span>
         </div>
 		</div>
 	</div>

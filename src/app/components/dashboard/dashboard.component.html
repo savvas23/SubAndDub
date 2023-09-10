@@ -1,6 +1,6 @@
 <div *ngIf="(user$ | async)" class="dashboard-wrapper">
     <div class="dashboard-header">
-        <h1>My Videos</h1>
+        <h1>My Videos ({{(userVideos$ | async)?.length}})</h1>
         <button mat-mini-fab color="primary" 
            (click)="openDialog()" matTooltip="Add New video"><mat-icon>add</mat-icon>
     </button>
@@ -10,8 +10,8 @@
             <h3>No videos found, click on the button to get started!</h3>
         </div>
         <ng-template #videos>
-            <div class="" *ngFor="let videos of userVideos$ | async">
-                <video-card></video-card>
+            <div class="" *ngFor="let video of userVideos$ | async">
+                <video-card *ngIf="youtubeVideoDetails" [videoId]="video.videoId" [videoDetails]="getVideoDetailsById(video.videoId)"></video-card>
             </div>
         </ng-template>            
     </div>

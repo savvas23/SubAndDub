@@ -6,10 +6,13 @@
 .url-wrapper {
     padding:10px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items:center;
 }
 
 .mdc-button {
-    margin:6px 0 0 16px;
-    height:42px
+    margin-top:10px;
+    height:42px;
+    width:100px;
 }

@@ -25,7 +25,11 @@ export class VideoInitFormComponent {
   onSubmit(): void {
     if (this.form.valid) {
       const controllerValue = this.form?.get('youtubeUrl')?.value as string;
-      this.youtubeVideoId = controllerValue.split('v=')[1]; //returns the ID part of the youtube video URL
+      var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      var match = controllerValue.match(regExp);
+      this.youtubeVideoId = (match && match[7].length === 11) ? match[7] : null;
+      //exctract the video id from all possible youtube url combinations
+
       this.dialogRef.close(this.youtubeVideoId);
     }
   }
