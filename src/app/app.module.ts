@@ -38,6 +38,9 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { SignInComponent } from './components/sign-in/sign-in.component';
 import { MatDialogModule} from '@angular/material/dialog';
 import { VideoCardComponent } from './components/video-card/video-card.component';
+import { FullscreenLoaderComponent } from './shared/components/fullscreen-loader/fullscreen-loader.component';
+import { DialogConfirmationComponent } from './shared/components/dialog-confirmation/dialog-confirmation.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 
@@ -59,6 +62,8 @@ import { VideoCardComponent } from './components/video-card/video-card.component
     DashboardComponent,
     SignInComponent,
     VideoCardComponent,
+    FullscreenLoaderComponent,
+    DialogConfirmationComponent,
   ],
   imports: [
     BrowserModule,
@@ -83,7 +88,8 @@ import { VideoCardComponent } from './components/video-card/video-card.component
     AngularFireDatabaseModule,
     MatToolbarModule,
     MatDividerModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

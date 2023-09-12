@@ -1,17 +1,20 @@
 <div *ngIf="(user$ | async)" class="dashboard-wrapper">
     <div class="dashboard-header">
         <h1>My Videos ({{(userVideos$ | async)?.length}})</h1>
-        <button mat-mini-fab color="primary" 
+        <button mat-mini-fab color="primary"
            (click)="openDialog()" matTooltip="Add New video"><mat-icon>add</mat-icon>
-    </button>
+        </button>
     </div>
     <div class="video-container">
         <div class="no-video" *ngIf="!(userVideos$ | async); else videos">
-            <h3>No videos found, click on the button to get started!</h3>
+            <h3>No videos found, click on the + button to get started!</h3>
         </div>
         <ng-template #videos>
             <div class="" *ngFor="let video of userVideos$ | async">
-                <video-card *ngIf="youtubeVideoDetails" [videoId]="video.videoId" [videoDetails]="getVideoDetailsById(video.videoId)"></video-card>
+                <video-card *ngIf="youtubeVideoDetails" [videoId]="video.videoId"
+                (editVideoEmitter)="navigateToEdit($event)"
+                (deleteVideoEmitter)="deleteVideoPrompt($event)"
+                 [videoDetails]="getVideoDetailsById(video.videoId)"></video-card>
             </div>
         </ng-template>            
     </div>
@@ -20,3 +23,4 @@
     <app-video-init-form class="video-init-form" *ngIf="isFormOpen">
     </app-video-init-form>
 </div>
+<fullscreen-loader *ngIf="(loading$ | async)"></fullscreen-loader>

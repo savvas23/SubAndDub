@@ -17,7 +17,7 @@ export class YoutubeService {
     const commaSeparatedIds = videoIds.join(',');
     const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&part=statistics&id=${commaSeparatedIds}&key=${GOOGLE_API_KEY}`
     return this.http.get<YoutubeResponse>(url).pipe(
-      map((res) =>  {
+      map((res) => {
         if (res)
           return res.items;
         return;

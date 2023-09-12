@@ -1,7 +1,8 @@
 <mat-card>
     <mat-card-content class="card-content">
-        <sd-loader *ngIf="!playerReady"></sd-loader>
-        <youtube-player [width]="650" [height]="420" (ready)="playerLoaded()" [videoId]="videoId">
+        <youtube-player (ready)="playerLoaded()" [videoId]="videoId">
         </youtube-player>
     </mat-card-content>
 </mat-card>
+<fullscreen-loader *ngIf="!playerReady"></fullscreen-loader>
+

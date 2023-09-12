@@ -1,5 +1,7 @@
+<button class="back-button" (click)="navigateToDashboard()" mat-mini-fab color="primary"
+    matTooltip="Back to Dashboard"><mat-icon>arrow_back</mat-icon>
+</button>
 <div class="wrapper">
-    <user-videos></user-videos>
     <video-player [videoId]="videoId"></video-player>
     <dialog-component></dialog-component>
 </div>

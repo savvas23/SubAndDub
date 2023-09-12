@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.model';
 
 @Component({
@@ -9,12 +9,23 @@ import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.mod
 export class VideoCardComponent implements OnInit {
   @Input() videoId: string
   @Input() videoDetails: YoutubeVideoDetails;
+  @Output() editVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
+  @Output() deleteVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
+
   publishDate: string;
 
   constructor() { }
 
   ngOnInit(): void {
     this.publishDate = timeSince(new Date(this.videoDetails?.snippet?.publishedAt));
+  }
+
+  editVideo(id: string): void {
+    this.editVideoEmitter.emit(id);
+  }
+
+  deleteVideo(id: string): void {
+    this.deleteVideoEmitter.emit(id);
   }
 }
 

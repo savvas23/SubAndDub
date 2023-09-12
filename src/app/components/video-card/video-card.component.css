@@ -1,13 +1,13 @@
 .yt-card {
-    max-width: 350px;
+    max-width: 450px;
     max-height: 350px;
-    width: 400px;
-    height: 300px;
+    width: 420px;
+    height: 350px;
     font-family: sans-serif;
-    display: inline-block;
+    display: flex;
     flex-direction: column;
     overflow: hidden;
-    margin: 10px;
+    margin: 10px 10px 10px 0;
     box-shadow: rgb(113, 113, 114) 0px 10px 35px -10px;
     border-radius:5px;
   }
@@ -60,4 +60,16 @@
     text-decoration: none;
   }
 
-  
+  .actions {
+    height:30px;
+    display:flex;
+    padding-left:15px;
+    padding-bottom:15px;
+    flex-grow: 1;
+    align-items: flex-end;
+    gap:20px;
+  }
+
+  .actions:hover {
+    cursor: pointer;
+  }
