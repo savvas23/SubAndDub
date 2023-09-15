@@ -31,7 +31,6 @@ import { environment } from 'src/environments/environment';
 import { LoginButtonComponent } from './shared/components/login-button/login-button.component';
 import { MatToolbarModule} from '@angular/material/toolbar';
 import { VideoInitFormComponent } from './components/video-add-form/video-init-form.component';
-import { UserVideosComponent } from './subtitling-container/user-videos/user-videos.component';
 import { MatDividerModule} from '@angular/material/divider';
 import { HomeCardsComponent } from './shared/components/home-cards/home-cards.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -41,7 +40,9 @@ import { VideoCardComponent } from './components/video-card/video-card.component
 import { FullscreenLoaderComponent } from './shared/components/fullscreen-loader/fullscreen-loader.component';
 import { DialogConfirmationComponent } from './shared/components/dialog-confirmation/dialog-confirmation.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
+import { SubTimelineComponent } from './subtitling-container/sub-timeline/sub-timeline.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { SubtitleTileComponent } from './subtitling-container/sub-timeline/subtitle-tile/subtitle-tile.component';
 
 
 
@@ -57,13 +58,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MenuComponent,
     LoginButtonComponent,
     VideoInitFormComponent,
-    UserVideosComponent,
     HomeCardsComponent,
     DashboardComponent,
     SignInComponent,
     VideoCardComponent,
     FullscreenLoaderComponent,
     DialogConfirmationComponent,
+    SubTimelineComponent,
+    SubtitleTileComponent,
   ],
   imports: [
     BrowserModule,
@@ -89,7 +91,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatToolbarModule,
     MatDividerModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    DragDropModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

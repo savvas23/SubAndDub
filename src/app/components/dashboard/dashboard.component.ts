@@ -10,6 +10,7 @@ import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.mod
 import { Router } from '@angular/router';
 import { DialogConfirmationComponent } from 'src/app/shared/components/dialog-confirmation/dialog-confirmation.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NoopScrollStrategy } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,7 +58,7 @@ export class DashboardComponent implements OnInit,OnDestroy {
   }
 
   deleteVideoPrompt(videoId: string): void {
-    const dialogRef= this.dialog.open(DialogConfirmationComponent, {width:'400px'})
+    const dialogRef= this.dialog.open(DialogConfirmationComponent, {width:'400px', scrollStrategy: new NoopScrollStrategy()})
     dialogRef.afterClosed().subscribe((deletionFlag)=>{
       if (deletionFlag === true) {
         this.dashboardService.deleteVideo(videoId, this.userId$.value);

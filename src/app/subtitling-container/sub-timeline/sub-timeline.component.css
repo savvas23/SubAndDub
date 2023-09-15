@@ -1,0 +1,31 @@
+.timeline {
+    bottom:0;
+    position:fixed;
+    width:100%;
+    background:white;
+    height:100px;
+    display:flex;
+    border:1px solid rgb(213 213 213 / 53%);
+
+}
+
+.subs-container{
+    display:flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.icon {
+    display:flex;
+    height:100%;
+    padding-left:30px;
+    padding-right:30px;
+    align-items: center;
+    border:1px solid rgb(213 213 213 / 53%);
+}
+
+.sub-tiles {
+    display:flex;
+    flex-grow:1;
+    padding-left:20px;
+}
