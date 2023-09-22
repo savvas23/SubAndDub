@@ -12,10 +12,9 @@ export class YoutubeService {
 
   constructor(private http: HttpClient) { }
 
-  getVideoDetails(videoIdsArray: Video[]): Observable<YoutubeVideoDetails[]> {
-    const videoIds = videoIdsArray.map((item) => item.videoId);
-    const commaSeparatedIds = videoIds.join(',');
-    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&part=statistics&id=${commaSeparatedIds}&key=${GOOGLE_API_KEY}`
+  getVideoDetails(videoIdsPayload: string): Observable<YoutubeVideoDetails[]> {
+    const videoIds = videoIdsPayload;
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&part=statistics&part=contentDetails&id=${videoIds}&key=${GOOGLE_API_KEY}`
     return this.http.get<YoutubeResponse>(url).pipe(
       map((res) => {
         if (res)

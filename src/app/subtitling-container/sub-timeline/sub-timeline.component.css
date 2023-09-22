@@ -1,12 +1,17 @@
-.timeline {
+.wrapper {
     bottom:0;
     position:fixed;
     width:100%;
+    flex-direction:column;
+    display:flex;
+}
+
+.timeline {
+    flex-grow: 1;
+    display:flex;
     background:white;
     height:100px;
-    display:flex;
     border:1px solid rgb(213 213 213 / 53%);
-
 }
 
 .subs-container{
@@ -25,7 +30,10 @@
 }
 
 .sub-tiles {
-    display:flex;
-    flex-grow:1;
     padding-left:20px;
+    display:flex;
+}
+
+.header-duration-container {
+    display: flex;
 }

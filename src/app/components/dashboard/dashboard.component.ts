@@ -42,13 +42,14 @@ export class DashboardComponent implements OnInit,OnDestroy {
             this.userId$.next(user?.uid);
             this.userVideos$ = this.dashboardService.getVideos(user.uid);
           return this.userVideos$.pipe(
-            mergeMap((videos) => {
-              return this.youtubeService.getVideoDetails(videos);
+            mergeMap((videos: Video[]) => {
+              const commaSeperatedIds = videos.map(item => { return item.videoId }).join(',');
+              return this.youtubeService.getVideoDetails(commaSeperatedIds);
             }));
     }})).subscribe((res: YoutubeVideoDetails[]) => {
           if (res) {
             this.youtubeVideoDetails = res;
-            setTimeout(() => this.loading$.next(false), 500)
+            this.loading$.next(false);
           }
     });
   }
@@ -58,12 +59,12 @@ export class DashboardComponent implements OnInit,OnDestroy {
   }
 
   deleteVideoPrompt(videoId: string): void {
-    const dialogRef= this.dialog.open(DialogConfirmationComponent, {width:'400px', scrollStrategy: new NoopScrollStrategy()})
-    dialogRef.afterClosed().subscribe((deletionFlag)=>{
+    const dialogRef= this.dialog.open(DialogConfirmationComponent, {width:'400px', scrollStrategy: new NoopScrollStrategy()});
+    dialogRef.afterClosed().subscribe((deletionFlag) => {
       if (deletionFlag === true) {
         this.dashboardService.deleteVideo(videoId, this.userId$.value);
       }
-    })
+    });
   }
 
   openDialog(): void {

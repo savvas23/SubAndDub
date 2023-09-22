@@ -11,6 +11,7 @@ export interface YoutubeResponse {
     id: string
     snippet: Snippet
     statistics?: Statistics
+    contentDetails?: any
   }
   
   export interface Snippet {
@@ -33,43 +34,19 @@ export interface YoutubeResponse {
   }
   
   export interface Thumbnails {
-    default: Default
-    medium: Medium
-    high: High
-    standard: Standard
-    maxres: Maxres
+    default: ImageRes
+    medium: ImageRes
+    high: ImageRes
+    standard: ImageRes
+    maxres: ImageRes
   }
   
-  export interface Default {
+  export interface ImageRes {
     url: string
     width: number
     height: number
   }
-  
-  export interface Medium {
-    url: string
-    width: number
-    height: number
-  }
-  
-  export interface High {
-    url: string
-    width: number
-    height: number
-  }
-  
-  export interface Standard {
-    url: string
-    width: number
-    height: number
-  }
-  
-  export interface Maxres {
-    url: string
-    width: number
-    height: number
-  }
-  
+
   export interface Localized {
     title: string
     description: string
