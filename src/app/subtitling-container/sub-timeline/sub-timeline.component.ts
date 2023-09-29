@@ -10,25 +10,47 @@ import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.mod
 
 export class SubTimelineComponent implements OnChanges {
   @Input() videoDurationISO: string;
-  durationReadable: number;
+  durationToSeconds: number;
+  timelinePoints: string[];
 
   ngOnChanges(changes?: SimpleChanges): void {
     const value = changes['videoDurationISO'].currentValue;
     if (value) {
       //parse youtube duration format like -> PT5M13S, to seconds
-      var match = value.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+      let match = value.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
 
-      match = match.slice(1).map(function(x) {
+      match = match.slice(1).map(x => {
         if (x != null) {
             return x.replace(/\D/, '');
         }
       });
     
-      var hours = (parseInt(match[0]) || 0);
-      var minutes = (parseInt(match[1]) || 0);
-      var seconds = (parseInt(match[2]) || 0);
+      const hours = (parseInt(match[0]) || 0);
+      const minutes = (parseInt(match[1]) || 0);
+      const seconds = (parseInt(match[2]) || 0);
     
-      this.durationReadable = hours * 3600 + minutes * 60 + seconds;
+      this.durationToSeconds = hours * 3600 + minutes * 60 + seconds;
+      const interval = 3; // 3-second periods
+      this.timelinePoints = this.generateTimeArray(this.durationToSeconds, interval);
     }
   }
+
+  generateTimeArray(totalSeconds: number, interval: number) {
+    let timeArray: string[] = [];
+    for (let i = 0; i <= totalSeconds; i += interval) {
+        timeArray.push(this.formatTime(i));
+    }
+    return timeArray;
+  }
+
+  formatTime(seconds: number) {
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    const milliseconds = (seconds % 1).toFixed(3).substring(2);
+    
+    return (minutes < 10 ? "0" : "") + minutes + ":" +
+        (remainingSeconds < 10 ? "0" : "") + remainingSeconds + "." +
+        (milliseconds.length < 3 ? "0" : "") + milliseconds;
+  }
+  
 }

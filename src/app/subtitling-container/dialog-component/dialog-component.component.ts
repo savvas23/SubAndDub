@@ -1,5 +1,5 @@
 import { Component, OnInit,ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/general/dialog-box.model';
 import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
@@ -46,7 +46,7 @@ export class DialogComponentComponent implements OnInit {
         subtitles: this.fb.control(''),
         start_time: this.fb.control('00:00:00.000'),
         end_time: this.fb.control('00:00:02.000'),
-      }),
+      }, {updateOn:'blur'}),
     });
 
     this.getSupportedLanguages();
@@ -62,8 +62,7 @@ export class DialogComponentComponent implements OnInit {
       subtitles: this.fb.control((value?.subtitleText) ? value.subtitleText : ''),
       start_time: this.fb.control((value?.start_time) ? value.start_time : this.setStartTimeControlValue()),
       end_time: this.fb.control((value?.end_time) ? value.end_time : this.setEndTimeControlValue()), 
-    },
-    {updateOn:'blur'}
+    }, {updateOn:'blur'}
     ));
 
     this.dialogBoxes.push({
@@ -72,7 +71,7 @@ export class DialogComponentComponent implements OnInit {
   }
 
   deleteDialogBox(deleteId: number): void {
-    this.form.removeControl(deleteId + '-dialogBox')
+    this.form.removeControl(deleteId + '-dialogBox');
     this.dialogBoxes = this.dialogBoxes.filter(dialogBox => dialogBox.id !== deleteId);
   }
 
@@ -114,7 +113,7 @@ export class DialogComponentComponent implements OnInit {
       return item === event.id + '-dialogBox'
     }) + 1; //add 1 so it returns the actual control id
     
-    const prevControl = this.form.get((currentIndex -1) + '-dialogBox');
+    const prevControl = this.form.get((currentIndex - 1) + '-dialogBox');
     const currentControl = this.form.get(currentIndex + '-dialogBox');
     
     const startTimestampFormatted = parseTimestamp(currentControl.get('start_time').value);
@@ -134,8 +133,6 @@ export class DialogComponentComponent implements OnInit {
         currentControl.get('start_time').setErrors(null);
       }
     }
-
-    return;
   }
 
   endTimeValidation(event: TimeEmitterObject): void {
@@ -223,4 +220,19 @@ export function parseTimestamp(value: string): TimeFormat {
 
 export function calculateSeconds(timeFormat: TimeFormat): number {
   return (timeFormat.hour * 60 * 60) + (timeFormat.minute * 60) + timeFormat.seconds + (timeFormat.ms/1000);
+}
+
+
+export function timeValidation(): ValidatorFn {
+  return (group: FormGroup): ValidationErrors => {
+    console.log(group)
+    // const control1 = group.controls['myControl1'];
+    // const control2 = group.controls['myControl2'];
+    // if (control1.value !== control2.value) {
+    //    control2.setErrors({notEquivalent: true});
+    // } else {
+    //    control2.setErrors(null);
+    // }
+    return;
+};
 }

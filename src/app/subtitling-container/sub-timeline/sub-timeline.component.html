@@ -1,6 +1,6 @@
 <div class="wrapper">
     <div class="header-duration-container">
-        {{durationReadable}}
+        <div *ngFor="let point of timelinePoints">{{point}}</div>
     </div>
     <div class="timeline">
         <div class="subs-container">
