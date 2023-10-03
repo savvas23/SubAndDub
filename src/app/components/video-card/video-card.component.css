@@ -9,7 +9,7 @@
     overflow: hidden;
     margin: 10px 10px 10px 0;
     box-shadow: rgb(113, 113, 114) 0px 10px 35px -10px;
-    border-radius:5px;
+    border-radius:15px;
   }
 
   .yt-card .thumb{
@@ -72,4 +72,9 @@
 
   .actions:hover {
     cursor: pointer;
+  }
+
+  .yt-card:hover {
+    border-radius:0px;
+    transition: 0.3s;
   }

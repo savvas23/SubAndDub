@@ -27,8 +27,7 @@
         [index]="dialogIndex"
         [dialogId]="dialogBox.id"
         (deleteDialogBoxEvent)="deleteDialogBox($event)"
-        (startTimeValueValidation)="startTimeValidation($event)"
-        (endTimeValueValidation)="endTimeValidation($event)">
+        (dialogEmitter)="timeRangeValidation($event)">
         </dialog-content>
     </div>
 </div>

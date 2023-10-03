@@ -46,7 +46,7 @@ export class DialogComponentComponent implements OnInit {
         subtitles: this.fb.control(''),
         start_time: this.fb.control('00:00:00.000'),
         end_time: this.fb.control('00:00:02.000'),
-      }, {updateOn:'blur'}),
+      }),
     });
 
     this.getSupportedLanguages();
@@ -62,8 +62,7 @@ export class DialogComponentComponent implements OnInit {
       subtitles: this.fb.control((value?.subtitleText) ? value.subtitleText : ''),
       start_time: this.fb.control((value?.start_time) ? value.start_time : this.setStartTimeControlValue()),
       end_time: this.fb.control((value?.end_time) ? value.end_time : this.setEndTimeControlValue()), 
-    }, {updateOn:'blur'}
-    ));
+    }));
 
     this.dialogBoxes.push({
       id: this.dialogBoxId
@@ -107,39 +106,63 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
-  startTimeValidation(event: TimeEmitterObject): void {
+  timeRangeValidation(dialogContent: TimeEmitterObject): void {
+    const prevGroup = this.form.get((dialogContent.id - 1) + '-dialogBox') as FormGroup;
+    const currentGroup = this.form.get(dialogContent.id + '-dialogBox') as FormGroup;
+    const nextGroup = this.form.get((dialogContent.id + 1) + '-dialogBox') as FormGroup;
 
-    const currentIndex = Object.keys(this.form.controls).findIndex((item) => {
-      return item === event.id + '-dialogBox'
-    }) + 1; //add 1 so it returns the actual control id
-    
-    const prevControl = this.form.get((currentIndex - 1) + '-dialogBox');
-    const currentControl = this.form.get(currentIndex + '-dialogBox');
-    
-    const startTimestampFormatted = parseTimestamp(currentControl.get('start_time').value);
-    const endTimestampFormatted = parseTimestamp(currentControl.get('end_time').value);
+    const startTimestampFormatted = parseTimestamp(currentGroup.get('start_time').value);
+    const endTimestampFormatted = parseTimestamp(currentGroup.get('end_time').value);
+
+    (dialogContent.control === 'start_time') ? 
+    this.startTimeValidation(prevGroup, currentGroup, startTimestampFormatted, endTimestampFormatted) :
+    this.endTimeValidation(nextGroup, currentGroup, startTimestampFormatted, endTimestampFormatted);
+  }
+
+  startTimeValidation(prevGroup: FormGroup, currentGroup: FormGroup, startTimestampFormatted: TimeFormat, endTimestampFormatted: TimeFormat): void {
 
     if (calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted)) {
-      currentControl.get('start_time').setErrors({higherStartTime:true});
+      currentGroup.get('start_time').setErrors({higherStartTime:true});
     } else {
-      currentControl.get('start_time').setErrors(null);
+      currentGroup.get('start_time').setErrors(null);
     }
 
-    if (currentIndex > 1) {
-      const prevEndTimestampFormatted = parseTimestamp(prevControl?.get('end_time')?.value);
-      if (calculateSeconds(prevEndTimestampFormatted) > calculateSeconds(startTimestampFormatted)){
-        currentControl.get('start_time').setErrors({higherPrevEndTime:true});
+    if (prevGroup) {
+      const prevEndTimestampFormatted = parseTimestamp(prevGroup?.get('end_time')?.value);
+      if (calculateSeconds(prevEndTimestampFormatted) > calculateSeconds(startTimestampFormatted)) {
+        currentGroup.get('start_time').setErrors({higherPrevEndTime:true});
+        prevGroup.get('end_time').setErrors({higherPrevEndTime:true});
+      } else if (calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted)) {
+        currentGroup.get('start_time').setErrors({higherStartTime:true});
       } else {
-        currentControl.get('start_time').setErrors(null);
+        currentGroup.get('start_time').setErrors(null);
+        prevGroup.get('end_time').setErrors(null);
       }
+      currentGroup.get('start_time').markAsTouched();
+      prevGroup.get('end_time').markAsTouched();
     }
   }
 
-  endTimeValidation(event: TimeEmitterObject): void {
-    const currentIndex =  Object.keys(this.form.controls).findIndex((item) => {
-      return item === event.id + '-dialogBox'
-    }) + 1; //add 1 so it returns the actual control id
+  endTimeValidation(nextGroup: FormGroup, currentGroup: FormGroup, startTimestampFormatted: TimeFormat, endTimestampFormatted: TimeFormat): void {
 
+    if (calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted)) {
+      currentGroup.get('start_time').setErrors({higherStartTime:true});
+    } else {
+      currentGroup.get('start_time').setErrors(null);
+    }
+
+    if (nextGroup) {
+      const nextStartTimestampFormatted = parseTimestamp(nextGroup?.get('start_time')?.value);
+      if (calculateSeconds(nextStartTimestampFormatted) < calculateSeconds(endTimestampFormatted)) {
+        currentGroup.get('end_time').setErrors({higherPrevEndTime:true});
+        nextGroup.get('start_time').setErrors({higherPrevEndTime:true});
+      } else {
+        currentGroup.get('end_time').setErrors(null);
+        nextGroup.get('start_time').setErrors(null);
+      }
+      currentGroup.get('end_time').markAsTouched();
+      nextGroup.get('start_time').markAsTouched();
+    }
   }
 
   translateSubtitles(targetLanguage: string): void {
