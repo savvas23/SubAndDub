@@ -146,9 +146,9 @@ export class DialogComponentComponent implements OnInit {
   endTimeValidation(nextGroup: FormGroup, currentGroup: FormGroup, startTimestampFormatted: TimeFormat, endTimestampFormatted: TimeFormat): void {
 
     if (calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted)) {
-      currentGroup.get('start_time').setErrors({higherStartTime:true});
+      currentGroup.get('end_time').setErrors({higherStartTime:true});
     } else {
-      currentGroup.get('start_time').setErrors(null);
+      currentGroup.get('end_time').setErrors(null);
     }
 
     if (nextGroup) {
