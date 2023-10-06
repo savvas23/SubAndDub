@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, Observable, mergeMap, switchMap, tap} from 'rxjs';
 import { GmailUser, Video } from 'src/app/models/firestore-schema/user.model';
@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { DialogConfirmationComponent } from 'src/app/shared/components/dialog-confirmation/dialog-confirmation.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,13 +26,15 @@ export class DashboardComponent implements OnInit,OnDestroy {
   youtubeVideoDetails: YoutubeVideoDetails[];
   userId$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   isFormOpen: boolean = false;
+  private storage: AngularFireStorage = inject(AngularFireStorage);
 
   constructor(private auth: AuthService, 
     private dashboardService: DashboardService, 
     private youtubeService: YoutubeService,
     private router: Router,
     public dialog: MatDialog,
-    private snackbar: MatSnackBar) { }
+    private snackbar: MatSnackBar,
+    ) { }
 
   ngOnInit(): void {
     this.user$ = this.auth.user;
@@ -52,6 +55,7 @@ export class DashboardComponent implements OnInit,OnDestroy {
             this.loading$.next(false);
           }
     });
+    // console.log(this.storage.ref('path'))
   }
 
   navigateToEdit(videoId: string): void {

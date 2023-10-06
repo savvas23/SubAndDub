@@ -22,7 +22,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { LoaderComponent } from './shared/components/loader/loader.component';
 import { MenuComponent } from './top-toolbar/menu/menu.component';
-import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireModule, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
@@ -43,6 +43,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SubTimelineComponent } from './subtitling-container/sub-timeline/sub-timeline.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SubtitleTileComponent } from './subtitling-container/sub-timeline/subtitle-tile/subtitle-tile.component';
+import { getStorage, provideStorage } from '@angular/fire/storage';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+// import { getStorage, provideStorage } from '@angular/fire/compat/storage';
 
 
 
@@ -84,6 +87,8 @@ import { SubtitleTileComponent } from './subtitling-container/sub-timeline/subti
     MatMenuModule,
     MatProgressSpinnerModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
+    // provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    // provideStorage(() => getStorage()),
     AngularFireAuthModule,
     AngularFirestoreModule,
     AngularFireStorageModule,
@@ -94,7 +99,7 @@ import { SubtitleTileComponent } from './subtitling-container/sub-timeline/subti
     MatSnackBarModule,
     DragDropModule,
   ],
-  providers: [],
+  providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebaseConfig }, ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
