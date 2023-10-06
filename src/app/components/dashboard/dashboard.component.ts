@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject, Observable, mergeMap, switchMap, tap} from 'rxjs';
+import { BehaviorSubject, Observable, mergeMap, switchMap, take, tap} from 'rxjs';
 import { GmailUser, Video } from 'src/app/models/firestore-schema/user.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -19,9 +19,10 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
   styleUrls: ['./dashboard.component.css'],
   providers: [DashboardService]
 })
-export class DashboardComponent implements OnInit,OnDestroy {
+export class DashboardComponent implements OnInit {
   user$: Observable<GmailUser>;
   userVideos$: Observable<Video[]> = new Observable<Video[]>;
+  communityVideos$: Observable<Video[]> = new Observable<Video[]>;
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   youtubeVideoDetails: YoutubeVideoDetails[];
   userId$: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -44,18 +45,20 @@ export class DashboardComponent implements OnInit,OnDestroy {
           if (user) {
             this.userId$.next(user?.uid);
             this.userVideos$ = this.dashboardService.getVideos(user.uid);
-          return this.userVideos$.pipe(
+            this.communityVideos$ = this.dashboardService.getCommunityVideos();
+            this.communityVideos$.subscribe(val=>console.log(val))
+            return this.userVideos$.pipe(
             mergeMap((videos: Video[]) => {
               const commaSeperatedIds = videos.map(item => { return item.videoId }).join(',');
               return this.youtubeService.getVideoDetails(commaSeperatedIds);
             }));
-    }})).subscribe((res: YoutubeVideoDetails[]) => {
+          }
+        })).subscribe((res: YoutubeVideoDetails[]) => {
           if (res) {
             this.youtubeVideoDetails = res;
             this.loading$.next(false);
           }
     });
-    // console.log(this.storage.ref('path'))
   }
 
   navigateToEdit(videoId: string): void {
@@ -90,7 +93,9 @@ export class DashboardComponent implements OnInit,OnDestroy {
     this.dashboardService.addVideo(videoDetails, this.userId$.value);
   }
 
-  ngOnDestroy(): void {
-
+  requestCommunityHelp(videoId: string): void {
+    this.user$.pipe(take(1)).subscribe((user: GmailUser) => { 
+      this.dashboardService.requestCommunityHelp(videoId,user);
+    })
   }
 }

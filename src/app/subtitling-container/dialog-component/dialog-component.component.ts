@@ -209,6 +209,24 @@ export class DialogComponentComponent implements OnInit {
     });
   }
 
+  downloadSubtitle(): void {
+    let sbvContent = ''
+    Object.keys(this.form.controls).forEach((control) => {
+      const currentGroup = this.form.get(control);
+      sbvContent += `${currentGroup.get('start_time').value},${currentGroup.get('end_time').value}\n${currentGroup.get('subtitles').value}\n\n`;
+    });
+    const blob = new Blob([sbvContent], { type: 'text/sbv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'subtitles.sbv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    console.log(sbvContent)
+  }
+
   handleFileUpload(event: BehaviorSubject<string | ArrayBuffer>): void {
     let fileContent = event.value as string;
     let cleanArray = this.fileService.cleanMultilineString(fileContent);
@@ -218,7 +236,7 @@ export class DialogComponentComponent implements OnInit {
     });
 
     this.dialogBoxes = [];
-    this.dialogBoxId = 0;
+    this.dialogBoxId = 1;
 
     for (let individualSub of cleanArray) {
       this.addDialogBox(individualSub);
@@ -243,19 +261,4 @@ export function parseTimestamp(value: string): TimeFormat {
 
 export function calculateSeconds(timeFormat: TimeFormat): number {
   return (timeFormat.hour * 60 * 60) + (timeFormat.minute * 60) + timeFormat.seconds + (timeFormat.ms/1000);
-}
-
-
-export function timeValidation(): ValidatorFn {
-  return (group: FormGroup): ValidationErrors => {
-    console.log(group)
-    // const control1 = group.controls['myControl1'];
-    // const control2 = group.controls['myControl2'];
-    // if (control1.value !== control2.value) {
-    //    control2.setErrors({notEquivalent: true});
-    // } else {
-    //    control2.setErrors(null);
-    // }
-    return;
-};
 }
