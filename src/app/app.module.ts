@@ -43,11 +43,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SubTimelineComponent } from './subtitling-container/sub-timeline/sub-timeline.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SubtitleTileComponent } from './subtitling-container/sub-timeline/subtitle-tile/subtitle-tile.component';
-import { getStorage, provideStorage } from '@angular/fire/storage';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-// import { getStorage, provideStorage } from '@angular/fire/compat/storage';
-
-
 
 @NgModule({
   declarations: [
@@ -87,8 +82,6 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
     MatMenuModule,
     MatProgressSpinnerModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    // provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    // provideStorage(() => getStorage()),
     AngularFireAuthModule,
     AngularFirestoreModule,
     AngularFireStorageModule,
@@ -99,7 +92,7 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
     MatSnackBarModule,
     DragDropModule,
   ],
-  providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebaseConfig }, ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
