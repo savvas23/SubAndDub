@@ -45,6 +45,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SubtitleTileComponent } from './subtitling-container/sub-timeline/subtitle-tile/subtitle-tile.component';
 import { CommunityVideoCardComponent } from './components/community-video-card/community-video-card.component';
 import { DetailsViewComponent } from './components/details-view/details-view.component';
+import {MatTableModule} from '@angular/material/table';
 
 @NgModule({
   declarations: [
@@ -94,6 +95,7 @@ import { DetailsViewComponent } from './components/details-view/details-view.com
     MatDividerModule,
     MatDialogModule,
     MatSnackBarModule,
+    MatTableModule,
     DragDropModule,
   ],
   providers: [],

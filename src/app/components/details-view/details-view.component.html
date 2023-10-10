@@ -1,15 +1,49 @@
-<div class="left-container">
-    <div class="dashboard-navigation">
-        <button class="back-button" (click)="navigateToDashboard()" mat-icon-button color="primary"><mat-icon>arrow_back</mat-icon>
-    </button>
-    Back to Dashboard
+<div class="wrapper">
+    <div class="left-container">
+        <div class="dashboard-navigation">
+            <button class="back-button" (click)="navigateToDashboard()" mat-icon-button color="primary"><mat-icon>arrow_back</mat-icon></button>
+            Back to Dashboard
+        </div>
+        <div *ngIf="(videoDetails$ | async) as videoDetails" class="video-details">
+            <a [href]="'//youtube.com/watch?v=' + videoDetails[0]?.id" target="_blank">
+                <img [src]="videoDetails[0]?.snippet.thumbnails?.medium?.url">
+            </a>
+            <h2>
+                {{(videoDetails[0]?.snippet?.title?.length > 50) ? (videoDetails[0]?.snippet?.title | slice:0:50) + '...' : (videoDetails[0]?.snippet?.title)}}
+            </h2>
+        </div>
     </div>
-    <div *ngIf="(videoDetails$ | async) as videoDetails" class="video-details">
-        <img  [src]="videoDetails[0]?.snippet.thumbnails?.medium?.url">
-        <h3>
+    <div class="main-content">
 
-        </h3>
+        <div class="subtitles-header">
+           <span>Subtitles</span>
+            <button mat-mini-fab color="primary"
+                matTooltip="Add new language"><mat-icon>add</mat-icon>
+            </button>
+        </div>
+
+        <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+            <ng-container matColumnDef="Language">
+              <mat-header-cell *matHeaderCellDef> Language </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
+            </ng-container>
+          
+
+            <ng-container matColumnDef="Last Updated">
+              <mat-header-cell *matHeaderCellDef> Last Updated </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+            </ng-container>
+          
+            <ng-container matColumnDef="Subtitles">
+              <mat-header-cell *matHeaderCellDef> Subtitles </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.weight}} </mat-cell>
+            </ng-container>
+          
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          </mat-table>
     </div>
 </div>
-<h3> ayooooooooooooo</h3>
+
 <fullscreen-loader *ngIf="(loading$ | async)"></fullscreen-loader>

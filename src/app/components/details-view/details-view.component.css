@@ -1,13 +1,43 @@
+.wrapper {
+    display:flex;
+
+}
+
+.main-content {
+    padding-top:10px;
+    padding-left:30px;
+    display:flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
 .left-container {
+    max-width: 35vh;
     display: flex;
     flex-direction: column;
+    padding-left:20px;
 }
 
 .dashboard-navigation {
     display: flex;
-    align-items: center
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .video-details{
-    display: flex
+    display: flex;
+    flex-direction: column;
+}
+
+.subtitles-header {
+    display: flex;
+    flex-direction: row;
+    align-items:center;
+    font-size: 32px;
+    gap: 30px
+}
+
+.mat-mdc-table {
+    background: none;
+    box-shadow: none;
 }
