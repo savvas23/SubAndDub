@@ -1,6 +1,4 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.model';
 
 @Component({
   selector: 'sub-timeline',

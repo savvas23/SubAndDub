@@ -25,7 +25,7 @@ export class DashboardService {
   }
 
   getCommunityVideos(): Observable<Video[]> {
-    return this.communityVideos$ = this.firestore.collectionGroup<Video>('videos',ref => ref.where('requestedCommunityHelp', '==', true)).valueChanges();
+    return this.communityVideos$ = this.firestore.collectionGroup<Video>('videos', ref => ref.where('requestedCommunityHelp', '==', true)).valueChanges()
   }
 
   addVideo(videoId: string, userUid: string): void {
@@ -57,7 +57,13 @@ export class DashboardService {
   requestCommunityHelp(videoId: string, user: GmailUser): void {
     const userRef: AngularFirestoreDocument<GmailUser> = this.firestore.doc(`users/${user.uid}`);
 
-    userRef.collection('videos').doc(videoId).set({requestedCommunityHelp: true}, {merge: true});
+    const data = {
+      requestedCommunityHelp: true,
+      requestedBy: user.displayName,
+      timestamp: Date.now()
+    }
+
+    userRef.collection('videos').doc(videoId).set(data, {merge: true});
 
   }
 

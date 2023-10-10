@@ -1,0 +1,13 @@
+.left-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-navigation {
+    display: flex;
+    align-items: center
+}
+
+.video-details{
+    display: flex
+}

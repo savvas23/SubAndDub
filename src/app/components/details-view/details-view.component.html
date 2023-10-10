@@ -1,0 +1,15 @@
+<div class="left-container">
+    <div class="dashboard-navigation">
+        <button class="back-button" (click)="navigateToDashboard()" mat-icon-button color="primary"><mat-icon>arrow_back</mat-icon>
+    </button>
+    Back to Dashboard
+    </div>
+    <div *ngIf="(videoDetails$ | async) as videoDetails" class="video-details">
+        <img  [src]="videoDetails[0]?.snippet.thumbnails?.medium?.url">
+        <h3>
+
+        </h3>
+    </div>
+</div>
+<h3> ayooooooooooooo</h3>
+<fullscreen-loader *ngIf="(loading$ | async)"></fullscreen-loader>

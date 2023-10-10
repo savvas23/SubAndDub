@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject, Observable, mergeMap, switchMap, take, tap} from 'rxjs';
 import { GmailUser, Video } from 'src/app/models/firestore-schema/user.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -12,6 +11,8 @@ import { DialogConfirmationComponent } from 'src/app/shared/components/dialog-co
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
+import { DetailsViewServiceService } from 'src/app/services/details-view-service.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,34 +36,50 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     public dialog: MatDialog,
     private snackbar: MatSnackBar,
+    private detailsViewService: DetailsViewServiceService
     ) { }
 
   ngOnInit(): void {
     this.user$ = this.auth.user;
-    this.user$.pipe(tap(()=> {
-      this.loading$.next(true);
-        }),switchMap((user) => {
+    this.loading$.next(true);
+    combineLatest([
+      this.user$,
+      this.user$.pipe(
+        distinctUntilChanged(),
+        switchMap(user => {
           if (user) {
-            this.userId$.next(user?.uid);
+            this.userId$.next(user.uid);
             this.userVideos$ = this.dashboardService.getVideos(user.uid);
             this.communityVideos$ = this.dashboardService.getCommunityVideos();
-            this.communityVideos$.subscribe(val=>console.log(val))
-            return this.userVideos$.pipe(
-            mergeMap((videos: Video[]) => {
-              const commaSeperatedIds = videos.map(item => { return item.videoId }).join(',');
-              return this.youtubeService.getVideoDetails(commaSeperatedIds);
-            }));
+            return combineLatest([this.userVideos$, this.communityVideos$]);
+          } else {
+            // If there is no user, return an empty observable
+            return of(null);
           }
-        })).subscribe((res: YoutubeVideoDetails[]) => {
-          if (res) {
-            this.youtubeVideoDetails = res;
-            this.loading$.next(false);
-          }
+        })
+      )
+    ]).pipe(
+      distinctUntilChanged(),
+      switchMap(([user, [userVideos, communityVideos]]) => {
+        const userVideoIds = userVideos.map(item => item.videoId);
+        const communityVideoIds = communityVideos.map(item => item.videoId);
+        
+        // Using Set to ensure unique video IDs
+        const uniqueVideoIds = new Set([...userVideoIds, ...communityVideoIds]);
+        
+        const allVideoIds = Array.from(uniqueVideoIds).join(',');
+        return this.youtubeService.getVideoDetails(allVideoIds);
+      })
+    ).subscribe((res: YoutubeVideoDetails[]) => {
+      if (res) {
+        this.youtubeVideoDetails = res;
+        this.loading$.next(false);
+      }
     });
   }
 
-  navigateToEdit(videoId: string): void {
-    this.router.navigate(['/edit', videoId]);
+  navigateToDetailsView(videoId: string): void {
+    this.router.navigate(['/details', videoId]);
   }
 
   deleteVideoPrompt(videoId: string): void {
@@ -81,7 +98,9 @@ export class DashboardComponent implements OnInit {
         this.snackbar.open('Video already exists in Collection.', 'DISMISS', {duration:5000});
         return;
       }
-      this.addVideoToUserCollection(result);
+
+      if (result) this.addVideoToUserCollection(result);
+
     });
   }
 

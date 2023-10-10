@@ -19,15 +19,6 @@ constructor(private route: ActivatedRoute, private router: Router, private youtu
 
 ngOnInit(): void {
     this.videoId = this.route.snapshot.paramMap.get('id');
-    // this.youtubeService.getVideoDetails(this.videoId).pipe(take(1),tap(() => {
-    //   this.loading$.next(true);
-    // })).subscribe((res) => {
-    //   if (res) { 
-    //     this.videoDetails$.next(res);
-    //     this.videoDuration = this.videoDetails$.value[0].contentDetails.duration;
-    //     this.loading$.next(false);
-    //   }
-    // })
 }
 
 navigateToDashboard(): void {
