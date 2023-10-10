@@ -1,11 +1,10 @@
 .wrapper {
     display:flex;
-
+    gap:100px;
 }
 
 .main-content {
     padding-top:10px;
-    padding-left:30px;
     display:flex;
     flex-direction: column;
     flex-grow: 1;
@@ -27,6 +26,10 @@
 .video-details{
     display: flex;
     flex-direction: column;
+}
+
+.video-details img {
+    width: 100%;
 }
 
 .subtitles-header {
