@@ -9,19 +9,20 @@ import { YoutubeVideoDetails } from '../models/youtube/youtube-response.model';
   templateUrl: './subtitling-container.component.html',
   styleUrls: ['./subtitling-container.component.css']
 })
-export class SubtitlingContainerComponent implements OnInit{
-  
-@Input() videoId: string;
-videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
-videoDuration: string;
-loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
-constructor(private route: ActivatedRoute, private router: Router, private youtubeService: YoutubeService) { }
+export class SubtitlingContainerComponent implements OnInit {
 
-ngOnInit(): void {
+  @Input() videoId: string;
+  videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
+  videoDuration: string;
+  loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  constructor(private route: ActivatedRoute, private router: Router, private youtubeService: YoutubeService) { }
+
+  ngOnInit(): void {
     this.videoId = this.route.snapshot.paramMap.get('id');
-}
+    this.youtubeService.getCaptions(this.videoId)
+  }
 
-navigateToDashboard(): void {
-    this.router.navigate(['dashboard']);
+  navigateToDetails(): void {
+    this.router.navigate(['details', this.videoId]);
   }
 }

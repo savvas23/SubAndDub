@@ -13,7 +13,7 @@ const routes: Routes = [
   {path: '', component: SignInComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectLoggedInToDashboard }},
   {path: 'dashboard', component: DashboardComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectUnauthorizedToLogin }},
   {path: 'details/:id', component: DetailsViewComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectUnauthorizedToLogin }},
-  {path: 'edit/:id', component: SubtitlingContainerComponent}
+  {path: 'edit/:id/:languageCode', component: SubtitlingContainerComponent}
 ]
 
 @NgModule({

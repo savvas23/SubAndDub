@@ -44,3 +44,7 @@
     background: none;
     box-shadow: none;
 }
+
+::ng-deep .mat-mdc-menu-content {
+    max-height: 700px;
+}

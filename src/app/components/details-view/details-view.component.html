@@ -11,38 +11,44 @@
             <h2>
                 {{(videoDetails[0]?.snippet?.title?.length > 50) ? (videoDetails[0]?.snippet?.title | slice:0:50) + '...' : (videoDetails[0]?.snippet?.title)}}
             </h2>
+            <!-- <video-card [videoDetails]="videoDetails[0]" [showActions]="false"></video-card> -->
         </div>
     </div>
-    <div class="main-content">
 
+    <div class="main-content">
         <div class="subtitles-header">
            <span>Subtitles</span>
             <button mat-mini-fab color="primary"
+                [matMenuTriggerFor]="translateMenu"
                 matTooltip="Add new language"><mat-icon>add</mat-icon>
             </button>
+            <mat-menu #translateMenu="matMenu">
+                    <p mat-menu-item *ngFor="let language of (supportedLanguages$ | async)?.data?.languages"
+                    (click)="addSubtitle(language)">
+                        {{language.name}}
+                    </p>
+            </mat-menu>
         </div>
-
         <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
             <ng-container matColumnDef="Language">
               <mat-header-cell *matHeaderCellDef> Language </mat-header-cell>
-              <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
-            </ng-container>
-          
+              <mat-cell *matCellDef="let element"> {{element.humanReadable}} </mat-cell>
+            </ng-container>  
 
             <ng-container matColumnDef="Last Updated">
               <mat-header-cell *matHeaderCellDef> Last Updated </mat-header-cell>
-              <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+              <mat-cell *matCellDef="let element"> {{element.lastUpdated | date: 'medium' }}  </mat-cell>
             </ng-container>
-          
+
             <ng-container matColumnDef="Subtitles">
               <mat-header-cell *matHeaderCellDef> Subtitles </mat-header-cell>
-              <mat-cell *matCellDef="let element"> {{element.weight}} </mat-cell>
+              <mat-cell *matCellDef="let element"><button mat-raised-button color="primary" (click)="editSubtitle(element.ISOcode)">Edit</button></mat-cell>
             </ng-container>
-          
+
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-          </mat-table>
+        </mat-table>
     </div>
 </div>
 

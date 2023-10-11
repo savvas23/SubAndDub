@@ -24,7 +24,6 @@ export class DialogComponentComponent implements OnInit {
   public _translatedText$: BehaviorSubject<GoogleTranslateResponse> = new BehaviorSubject<GoogleTranslateResponse>(null);
   protected loading: boolean;
   @ViewChild('translateMenu') translateMenu;
-  @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 
   public dialogBoxes: DialogBox[] = [{
     id: 1

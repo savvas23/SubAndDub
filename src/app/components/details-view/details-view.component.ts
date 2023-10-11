@@ -1,54 +1,88 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, take, tap } from 'rxjs';
+import { BehaviorSubject, of, switchMap, take, tap } from 'rxjs';
+import { Language, SupportedLanguages } from 'src/app/models/google/google-supported-languages';
 import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.model';
+import { AuthService } from 'src/app/services/auth.service';
 import { DetailsViewServiceService } from 'src/app/services/details-view-service.service';
+import { GoogleTranslateService } from 'src/app/services/googletranslate.service';
 import { YoutubeService } from 'src/app/services/youtube.service';
 
 @Component({
   selector: 'details-view',
   templateUrl: './details-view.component.html',
-  styleUrls: ['./details-view.component.css']
+  styleUrls: ['./details-view.component.css'],
+  providers: [GoogleTranslateService, DetailsViewServiceService]
 })
 export class DetailsViewComponent implements OnInit {
   videoId: string;
   videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
+  supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  userId$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  dataSource: Language[];
+
+  @ViewChild('translateMenu') translateMenu;
+
   displayedColumns = ['Language', 'Last Updated', 'Subtitles'];
-  dataSource;
-  constructor(private route: ActivatedRoute, private router: Router,private youtubeService: YoutubeService, private detailsViewService: DetailsViewServiceService) { }
+  constructor(private route: ActivatedRoute, 
+    private router: Router,
+    private youtubeService: YoutubeService,
+    private authService: AuthService,
+    private translateService: GoogleTranslateService,
+    private detailsViewService: DetailsViewServiceService) { }
 
   ngOnInit(): void {
-
-    this.dataSource = ELEMENT_DATA;
     this.videoId = this.route.snapshot.paramMap.get('id');
+
+    this.authService.user.pipe(take(1),
+      switchMap(user => {
+        if (user) {
+          this.userId$.next(user.uid);
+          return this.detailsViewService.getSubtitleLanguages(this.userId$.value, this.videoId);
+        } else {
+          return of(null); // Return an empty observable if there is no user
+        }
+      })).subscribe(languages => {
+      this.dataSource = languages;
+      console.log(this.dataSource)
+    });
+
     this.youtubeService.getVideoDetails(this.videoId).pipe(
       tap(() => {
         this.loading$.next(true);
-    })).subscribe((res) => {
+      })).subscribe((res) => {
       if (res) { 
         this.videoDetails$.next(res);
         this.loading$.next(false);
       }
-    })
+    });
+
+    this.getSupportedLanguages();
+  }
+
+  getSupportedLanguages(): void {
+    this.translateService.getSupportedLanguages()
+    .pipe(tap(() => {
+      this.loading$.next(true)
+    }))
+    .subscribe((response: SupportedLanguages) => {
+      this.supportedLanguages$.next(response);
+      this.loading$.next(false)
+    });
+    
+    console.log(this.supportedLanguages$)
+  }
+
+  addSubtitle(language: Language): void {
+    this.detailsViewService.addSubtitle(this.videoId, language, this.userId$.value);
+  }
+
+  editSubtitle(ISOcode): void {
+    this.router.navigate(['edit',this.videoId,ISOcode])
   }
 
   navigateToDashboard(): void {
     this.router.navigate(['dashboard']);
   }
-
 }
-
-
-export const ELEMENT_DATA = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'ayo', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
-];

@@ -1,16 +1,31 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { YoutubeVideoDetails } from '../models/youtube/youtube-response.model';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
+import { GmailUser } from '../models/firestore-schema/user.model';
+import { Language } from '../models/google/google-supported-languages';
+import { Observable, merge, take } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
+
 export class DetailsViewServiceService {
 
-  private youtubeVideoDetailsSource = new BehaviorSubject<YoutubeVideoDetails>(null);
-  youtubeVideoDetails$ = this.youtubeVideoDetailsSource.asObservable();
+  subtitleLanguages$: Observable<Language[]>;
 
-  setYoutubeVideoDetails(data: any) {
-    this.youtubeVideoDetailsSource.next(data);
+  getSubtitleLanguages(userUid: string, videoId: string): Observable<Language[]> {
+    return this.subtitleLanguages$ = this.firestore.collection<Language>(`users/${userUid}/videos/${videoId}/subtitles`).valueChanges();;
+  }
+
+  constructor(private firestore: AngularFirestore) {}
+
+  addSubtitle(videoId: string, language: Language, userUid: string): void {
+    const videoRef: AngularFirestoreDocument = this.firestore.doc(`users/${userUid}/videos/${videoId}/subtitles/${language.language}`);
+
+    const data = {
+      humanReadable: language.name,
+      ISOcode: language.language,
+      lastUpdated: Date.now()
+    }
+
+    videoRef.set(data, {merge: true});
+    this.subtitleLanguages$ = this.firestore.collection<Language>(`users/${userUid}/videos/${videoId}/subtitles`).valueChanges();
   }
 }

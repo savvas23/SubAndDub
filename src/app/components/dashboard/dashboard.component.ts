@@ -35,8 +35,7 @@ export class DashboardComponent implements OnInit {
     private youtubeService: YoutubeService,
     private router: Router,
     public dialog: MatDialog,
-    private snackbar: MatSnackBar,
-    private detailsViewService: DetailsViewServiceService
+    private snackbar: MatSnackBar
     ) { }
 
   ngOnInit(): void {

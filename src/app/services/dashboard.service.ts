@@ -66,5 +66,4 @@ export class DashboardService {
     userRef.collection('videos').doc(videoId).set(data, {merge: true});
 
   }
-
 }

@@ -9,6 +9,7 @@ import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.mod
 export class VideoCardComponent implements OnInit {
   @Input() videoId: string
   @Input() videoDetails: YoutubeVideoDetails;
+  @Input() showActions: boolean = true;
   @Output() editVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
   @Output() deleteVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
   @Output() requestCommunityHelpEmitter: EventEmitter<string> = new EventEmitter<string>;

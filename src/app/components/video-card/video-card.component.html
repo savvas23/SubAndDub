@@ -16,7 +16,7 @@
         	</div>
 		</div>
 	</div>
-	<div class="actions">
+	<div *ngIf="showActions" class="actions">
 			<mat-icon (click)="editVideo(videoDetails.id)" matTooltip="Go to Video Details">edit</mat-icon>
 			<mat-icon (click)="deleteVideo(videoDetails.id)" matTooltip="Delete Video from your collection">delete</mat-icon>
 			<mat-icon (click)="requestCommunityHelp(videoDetails.id)" matTooltip="Request help from the Community">feedback</mat-icon>
