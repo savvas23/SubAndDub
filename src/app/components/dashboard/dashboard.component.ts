@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { GmailUser, Video } from 'src/app/models/firestore-schema/user.model';
 import { AuthService } from 'src/app/services/auth.service';
@@ -12,7 +12,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
-import { DetailsViewServiceService } from 'src/app/services/details-view-service.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,6 +27,8 @@ export class DashboardComponent implements OnInit {
   youtubeVideoDetails: YoutubeVideoDetails[];
   userId$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   isFormOpen: boolean = false;
+  listView: boolean = false;
+  @ViewChild('userVideosContainer') userVideosContainer: ElementRef
   private storage: AngularFireStorage = inject(AngularFireStorage);
 
   constructor(private auth: AuthService, 
@@ -35,7 +36,8 @@ export class DashboardComponent implements OnInit {
     private youtubeService: YoutubeService,
     private router: Router,
     public dialog: MatDialog,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private renderer: Renderer2
     ) { }
 
   ngOnInit(): void {
@@ -115,5 +117,17 @@ export class DashboardComponent implements OnInit {
     this.user$.pipe(take(1)).subscribe((user: GmailUser) => { 
       this.dashboardService.requestCommunityHelp(videoId,user);
     })
+  }
+
+  changeToListView(): void {
+    this.listView = true;
+    this.renderer.removeClass(this.userVideosContainer.nativeElement,'grid-view');
+    this.renderer.addClass(this.userVideosContainer.nativeElement,'list-view');
+  }
+
+  changeToGridView(): void {
+    this.listView = false;
+    this.renderer.removeClass(this.userVideosContainer.nativeElement,'list-view');
+    this.renderer.addClass(this.userVideosContainer.nativeElement,'grid-view');
   }
 }
