@@ -13,6 +13,8 @@ export class VideoCardComponent implements OnInit {
   @Output() editVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
   @Output() deleteVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
   @Output() requestCommunityHelpEmitter: EventEmitter<string> = new EventEmitter<string>;
+  @Output() videoIdEmitter: EventEmitter<string> = new EventEmitter<string>;
+
 
   publishDate: string;
 
@@ -31,7 +33,11 @@ export class VideoCardComponent implements OnInit {
   }
 
   requestCommunityHelp(id: string): void {
-    this.requestCommunityHelpEmitter.emit(id)
+    this.requestCommunityHelpEmitter.emit(id);
+  }
+
+  emitVideoId(id: string): void {
+    this.videoIdEmitter.emit(id);
   }
 
   timeSince(date: Date): string {

@@ -1,21 +1,25 @@
 <mat-card>
     <mat-card-header>
       <mat-card-title>Subtitle {{index + 1}}</mat-card-title>
+      <mat-icon class="estimation-icon" [matTooltip]="estimationTooltip">{{estimationIcon}}</mat-icon>
       <mat-icon class="delete-action" (click)="deleteDialogBox(dialogId)" matTooltip="Delete Subtitle">delete</mat-icon>
     </mat-card-header>
     <mat-card-content>
         <mat-form-field subscriptSizing="dynamic">
-          <textarea matInput [formControl]="getDialogControl('subtitles')" type="text"></textarea>
+          <textarea matInput (input)="wordCounter(); characterCounter(); subtitlingTimingEstimation();" [formControl]="getDialogControl('subtitles')" type="text"></textarea>
         </mat-form-field>
         <div fxLayout="column" fxLayoutGap="10px" fxFlex="30">
           <mat-form-field subscriptSizing="dynamic">
             <mat-label>From:</mat-label>
-            <input matInput (input)="emitDialogId('start_time')" [formControl]="getDialogControl('start_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
+            <input matInput (input)="emitDialogId('start_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('start_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
           </mat-form-field>
           <mat-form-field subscriptSizing="dynamic">
             <mat-label>To:</mat-label>
-            <input matInput (input)="emitDialogId('end_time')" [formControl]="getDialogControl('end_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
+            <input matInput (input)="emitDialogId('end_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('end_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
           </mat-form-field>
         </div>
     </mat-card-content>
+    <mat-card-subtitle>
+      <span>{{wordCount}} words, {{characterCount}} characters, {{timingEstimation}}ms estimated reading time.</span>
+    </mat-card-subtitle>
 </mat-card>

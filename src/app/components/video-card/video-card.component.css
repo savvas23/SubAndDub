@@ -53,6 +53,7 @@
 
   .yt-card .title {
     margin-bottom: 10px;
+    cursor: pointer;
   }
   
   .yt-card a {

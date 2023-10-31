@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, Renderer2, SecurityContext, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { GmailUser, Video } from 'src/app/models/firestore-schema/user.model';
 import { AuthService } from 'src/app/services/auth.service';
@@ -12,12 +12,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-  providers: [DashboardService]
+  providers: [DashboardService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
   user$: Observable<GmailUser>;
@@ -28,6 +30,8 @@ export class DashboardComponent implements OnInit {
   userId$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   isFormOpen: boolean = false;
   listView: boolean = false;
+  videoSelectedId: string;
+  apiLoaded = false;
   @ViewChild('userVideosContainer') userVideosContainer: ElementRef
   private storage: AngularFireStorage = inject(AngularFireStorage);
 
@@ -37,6 +41,7 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     public dialog: MatDialog,
     private snackbar: MatSnackBar,
+    private sanitizer: DomSanitizer,
     private renderer: Renderer2
     ) { }
 
@@ -77,6 +82,15 @@ export class DashboardComponent implements OnInit {
         this.loading$.next(false);
       }
     });
+
+    if (!this.apiLoaded) {
+      // This code loads the IFrame Player API code asynchronously, according to the instructions at
+      // https://developers.google.com/youtube/iframe_api_reference#Getting_Started
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.body.appendChild(tag);
+      this.apiLoaded = true;
+    }
   }
 
   navigateToDetailsView(videoId: string): void {
@@ -119,14 +133,27 @@ export class DashboardComponent implements OnInit {
     })
   }
 
+  previewVideo(videoId: string): void {
+    this.videoSelectedId = videoId;
+  }
+
+  iframeURL(): SafeResourceUrl {
+    const url = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoSelectedId + '?autoplay=1');
+    console.log(url)
+    return url;
+  }
+
+
   changeToListView(): void {
     this.listView = true;
+    this.videoSelectedId = null;
     this.renderer.removeClass(this.userVideosContainer.nativeElement,'grid-view');
     this.renderer.addClass(this.userVideosContainer.nativeElement,'list-view');
   }
 
   changeToGridView(): void {
     this.listView = false;
+    this.videoSelectedId = null;
     this.renderer.removeClass(this.userVideosContainer.nativeElement,'list-view');
     this.renderer.addClass(this.userVideosContainer.nativeElement,'grid-view');
   }

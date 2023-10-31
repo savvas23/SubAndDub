@@ -8,9 +8,11 @@
             <a [href]="'//youtube.com/watch?v=' + videoDetails[0]?.id" target="_blank">
                 <img [src]="videoDetails[0]?.snippet.thumbnails?.medium?.url">
             </a>
-            <h2>
+            <div class="title">
+             <span>
                 {{(videoDetails[0]?.snippet?.title?.length > 50) ? (videoDetails[0]?.snippet?.title | slice:0:50) + '...' : (videoDetails[0]?.snippet?.title)}}
-            </h2>
+             </span>
+            </div>
             <!-- <video-card [videoDetails]="videoDetails[0]" [showActions]="false"></video-card> -->
         </div>
     </div>

@@ -1,12 +1,10 @@
 <div class="yt-card">
-	<div class="thumb">
-        <a [href]="'//youtube.com/watch?v=' + videoDetails?.id" target="_blank">
-			<img [src]="videoDetails?.snippet?.thumbnails?.medium.url">
-        </a>
+	<div class="thumb" (click)="emitVideoId(videoDetails.id)">
+		<img [src]="videoDetails?.snippet?.thumbnails?.medium.url">
 	</div>
 	<div class="details">
 		<div class="info">
-			<div class="title" > 
+			<div class="title" (click)="emitVideoId(videoDetails.id)" > 
 				{{ (videoDetails?.snippet?.title?.length > 50) ? (videoDetails?.snippet?.title | slice:0:50) + '...' : (videoDetails?.snippet?.title) }}
 			</div>
 			<div class="channel-name">{{videoDetails?.snippet?.channelTitle}}</div>
@@ -17,9 +15,9 @@
 		</div>
 	</div>
 	<div *ngIf="showActions" class="actions">
-			<mat-icon (click)="editVideo(videoDetails.id)" matTooltip="Go to Video Details">edit</mat-icon>
-			<mat-icon (click)="deleteVideo(videoDetails.id)" matTooltip="Delete Video from your collection">delete</mat-icon>
-			<mat-icon (click)="requestCommunityHelp(videoDetails.id)" matTooltip="Request help from the Community">feedback</mat-icon>
+		<mat-icon (click)="editVideo(videoDetails.id)" matTooltip="Go to Video Details">edit</mat-icon>
+		<mat-icon (click)="deleteVideo(videoDetails.id)" matTooltip="Delete Video from your collection">delete</mat-icon>
+		<mat-icon (click)="requestCommunityHelp(videoDetails.id)" matTooltip="Request help from the Community">feedback</mat-icon>
 	</div>
 </div>
 

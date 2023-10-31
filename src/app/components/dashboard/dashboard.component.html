@@ -10,7 +10,6 @@
         </div>
     </div>
 
-    
     <div class="view-wrapper">
         <div #userVideosContainer class="video-container">
             <div class="no-video" *ngIf="!(userVideos$ | async); else videos">
@@ -22,6 +21,7 @@
                     (editVideoEmitter)="navigateToDetailsView($event)"
                     (deleteVideoEmitter)="deleteVideoPrompt($event)"
                     (requestCommunityHelpEmitter)="requestCommunityHelp($event)"
+                    (videoIdEmitter)="previewVideo($event)"
                     [videoDetails]="getVideoDetailsById(video.videoId)"></video-card>
                 </div>            
             </ng-template>            
@@ -29,8 +29,13 @@
         <div *ngIf="listView" class="video-player-card">
             <mat-card>
                 <mat-card-content align="center" class="card-content">
-                    <mat-icon class="video-icon">video_library</mat-icon>
-                    <mat-card-title>Select a video to preview.</mat-card-title>
+                    <ng-container *ngIf="!videoSelectedId">
+                        <mat-icon class="video-icon">video_library</mat-icon>
+                        <mat-card-title>Select a video to preview.</mat-card-title>
+                    </ng-container>
+                    <div class="iframe-container" *ngIf="videoSelectedId">
+                        <youtube-player [videoId]="videoSelectedId"></youtube-player>
+                    </div>
                 </mat-card-content>
             </mat-card>
         </div>

@@ -2,7 +2,7 @@
     display: flex;
     width: 100%;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 40px;
     justify-content: space-around;
     padding-top: 20px;
 }
@@ -14,4 +14,8 @@
 
 .dashboard-navigation {
     padding-top: 15px;
+}
+
+video-player {
+    flex-grow: 0.8;
 }
