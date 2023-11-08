@@ -29,7 +29,6 @@ export class DashboardComponent implements OnInit {
   isFormOpen: boolean = false;
   listView: boolean = false;
   @ViewChild('userVideosContainer') userVideosContainer: ElementRef
-  private storage: AngularFireStorage = inject(AngularFireStorage);
 
   constructor(private auth: AuthService, 
     private dashboardService: DashboardService, 

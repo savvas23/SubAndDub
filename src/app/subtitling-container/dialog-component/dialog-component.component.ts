@@ -1,5 +1,5 @@
-import { Component, OnInit,ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { Component, EventEmitter, OnInit,Output,ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/general/dialog-box.model';
 import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
@@ -8,9 +8,9 @@ import { GoogleTranslateService } from 'src/app/services/googletranslate.service
 import { UploadFileHandlerService } from 'src/app/services/upload-file-handler.service';
 import { GoogleTranslateResponse, GoogleTranslations} from 'src/app/models/google/google-translate-response'
 import { SupportedLanguages } from 'src/app/models/google/google-supported-languages';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeFormat } from 'src/app/models/general/time-format.model';
 import { TimeEmitterObject } from './dialog-content/dialog-content.component';
+import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/shared-functions';
 
 @Component({
   selector: 'dialog-component',
@@ -22,14 +22,17 @@ export class DialogComponentComponent implements OnInit {
   public dialogBoxId: number = 1;
   public _supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
   public _translatedText$: BehaviorSubject<GoogleTranslateResponse> = new BehaviorSubject<GoogleTranslateResponse>(null);
+  public currentSelectedLanguage: string;
   protected loading: boolean;
+  @Output() subtitleUploadEmitter: EventEmitter<Blob> = new EventEmitter<Blob>();
+
   @ViewChild('translateMenu') translateMenu;
 
   public dialogBoxes: DialogBox[] = [{
     id: 1
   }];
 
-  public form: FormGroup;
+  public form: BehaviorSubject<FormGroup> = new BehaviorSubject<FormGroup>(null);
 
   get supportedLanguages$(): Observable<SupportedLanguages> {
     return this._supportedLanguages$;
@@ -37,27 +40,28 @@ export class DialogComponentComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
     private fileService: UploadFileHandlerService,
-    private google: GoogleTranslateService) {}
+    private google: GoogleTranslateService,
+    ) {}
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-      '1-dialogBox': this.fb.group({
-        subtitles: this.fb.control(''),
-        start_time: this.fb.control('00:00:00.000'),
-        end_time: this.fb.control('00:00:02.000'),
-      }),
-    });
-
-    this.getSupportedLanguages();
+    this.form.next(this.fb.group({
+        '1-dialogBox': this.fb.group({
+          subtitles: this.fb.control(''),
+          start_time: this.fb.control('00:00:00.000'),
+          end_time: this.fb.control('00:00:02.000'),
+        })
+      })
+    )
+        this.getSupportedLanguages();
   }
 
   getDialogControl(dialogBoxId: number): FormGroup {
-    return this.form.get(dialogBoxId + '-dialogBox') as FormGroup
+    return this.form.value.get(dialogBoxId + '-dialogBox') as FormGroup
   }
 
   addDialogBox(value: ImportModel = null): void {
     this.dialogBoxId ++;
-    this.form.addControl(((this.dialogBoxId + '-dialogBox')), this.fb.group({
+    this.form.value.addControl(((this.dialogBoxId + '-dialogBox')), this.fb.group({
       subtitles: this.fb.control((value?.subtitleText) ? value.subtitleText : ''),
       start_time: this.fb.control((value?.start_time) ? value.start_time : this.setStartTimeControlValue()),
       end_time: this.fb.control((value?.end_time) ? value.end_time : this.setEndTimeControlValue()), 
@@ -69,16 +73,16 @@ export class DialogComponentComponent implements OnInit {
   }
 
   deleteDialogBox(deleteId: number): void {
-    this.form.removeControl(deleteId + '-dialogBox');
+    this.form.value.removeControl(deleteId + '-dialogBox');
     this.dialogBoxes = this.dialogBoxes.filter(dialogBox => dialogBox.id !== deleteId);
   }
 
   setStartTimeControlValue(): string {
     if (this.dialogBoxes.length) {
-      const prevControlIndex = Object.keys(this.form.controls).length - 1;
-      const prevControl = Object.keys(this.form.controls);
+      const prevControlIndex = Object.keys(this.form.value.controls).length - 1;
+      const prevControl = Object.keys(this.form.value.controls);
       const targetControlString = prevControl[prevControlIndex].toString(); // get the string value of the name of last element of the form controls
-      return this.form?.get(targetControlString)?.get('end_time')?.value as string;
+      return this.form?.value?.get(targetControlString)?.get('end_time')?.value as string;
     } else {
       return '00:00:00.000';
     }
@@ -86,10 +90,10 @@ export class DialogComponentComponent implements OnInit {
 
   setEndTimeControlValue(): string {
     if (this.dialogBoxes.length) {
-      const prevControlIndex = Object.keys(this.form.controls).length - 1;
-      const prevControl = Object.keys(this.form.controls);
+      const prevControlIndex = Object.keys(this.form.value.controls).length - 1;
+      const prevControl = Object.keys(this.form.value.controls);
       const targetControlString = prevControl[prevControlIndex].toString();
-      const prevEndTime = this.form?.get(targetControlString)?.get('end_time')?.value as string; // // get the string value of the name of last element of the form controls
+      const prevEndTime = this.form?.value.get(targetControlString)?.get('end_time')?.value as string; // // get the string value of the name of last element of the form controls
       const prevEndTimeSplit = prevEndTime.split(':');
       let lastElement = parseInt(prevEndTimeSplit[2]); // Convert the last element to a number
       lastElement += 2; // Increase the last element by 2
@@ -106,9 +110,9 @@ export class DialogComponentComponent implements OnInit {
   }
 
   timeRangeValidation(dialogContent: TimeEmitterObject): void {
-    const prevGroup = this.form.get((dialogContent.id - 1) + '-dialogBox') as FormGroup;
-    const currentGroup = this.form.get(dialogContent.id + '-dialogBox') as FormGroup;
-    const nextGroup = this.form.get((dialogContent.id + 1) + '-dialogBox') as FormGroup;
+    const prevGroup = this.form.value.get((dialogContent.id - 1) + '-dialogBox') as FormGroup;
+    const currentGroup = this.form.value.get(dialogContent.id + '-dialogBox') as FormGroup;
+    const nextGroup = this.form.value.get((dialogContent.id + 1) + '-dialogBox') as FormGroup;
 
     const startTimestampFormatted = parseTimestamp(currentGroup.get('start_time').value);
     const endTimestampFormatted = parseTimestamp(currentGroup.get('end_time').value);
@@ -174,8 +178,8 @@ export class DialogComponentComponent implements OnInit {
       controlsName : []
     };
 
-    Object.keys(this.form.controls).forEach(control=> {
-      const controlValue = this.form.get(control).get('subtitles').value;
+    Object.keys(this.form.value.controls).forEach(control=> {
+      const controlValue = this.form.value.get(control).get('subtitles').value;
       if (controlValue) {
         translationObject.q.push(controlValue)
         controllersToChange.controlsName.push(control)
@@ -189,7 +193,7 @@ export class DialogComponentComponent implements OnInit {
 
         if (translationArray) {
           for (let i = 0; i < controllersToChange.controlsName.length; i++) {
-            const control = this.form.get(controllersToChange.controlsName[i]).get('subtitles');
+            const control = this.form.value.get(controllersToChange.controlsName[i]).get('subtitles');
             control.setValue(translationArray[i].translatedText);
           }
         }
@@ -208,13 +212,22 @@ export class DialogComponentComponent implements OnInit {
     });
   }
 
-  downloadSubtitle(): void {
+  uploadSubtitle(): void {
+    this.subtitleUploadEmitter.emit(this.createSubtitleBlob());
+  }
+
+  createSubtitleBlob(): Blob {
     let sbvContent = ''
-    Object.keys(this.form.controls).forEach((control) => {
-      const currentGroup = this.form.get(control);
+    Object.keys(this.form.value.controls).forEach((control) => {
+      const currentGroup = this.form.value.get(control);
       sbvContent += `${currentGroup.get('start_time').value},${currentGroup.get('end_time').value}\n${currentGroup.get('subtitles').value}\n\n`;
     });
     const blob = new Blob([sbvContent], { type: 'text/sbv' });
+    return blob;
+  }
+
+  downloadSubtitle(): void {
+    const blob = this.createSubtitleBlob()
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -223,15 +236,14 @@ export class DialogComponentComponent implements OnInit {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-    console.log(sbvContent)
   }
 
   handleFileUpload(event: BehaviorSubject<string | ArrayBuffer>): void {
     let fileContent = event.value as string;
     let cleanArray = this.fileService.cleanMultilineString(fileContent);
     // clear all controls, to rebuild form
-    Object.keys(this.form.controls).forEach(control=> {
-      this.form.removeControl(control);
+    Object.keys(this.form.value.controls).forEach(control=> {
+      this.form.value.removeControl(control);
     });
 
     this.dialogBoxes = [];
@@ -242,22 +254,4 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
-}
-
-export function parseTimestamp(value: string): TimeFormat {
-  const parts = value.split(':');
-  const [seconds, milliseconds] = parts[2].split('.');
-  
-  const timeformatObject: TimeFormat = {
-    hour: parseInt(parts[0], 10),
-    minute: parseInt(parts[1], 10),
-    seconds: parseInt(seconds, 10),
-    ms: parseInt(milliseconds, 10)
-  };
-  
-  return timeformatObject;
-}
-
-export function calculateSeconds(timeFormat: TimeFormat): number {
-  return (timeFormat.hour * 60 * 60) + (timeFormat.minute * 60) + timeFormat.seconds + (timeFormat.ms/1000);
 }
