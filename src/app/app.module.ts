@@ -5,7 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { VideoPlayerComponent } from './subtitling-container/video-player/video-player.component';
@@ -45,7 +45,10 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SubtitleTileComponent } from './subtitling-container/sub-timeline/subtitle-tile/subtitle-tile.component';
 import { CommunityVideoCardComponent } from './components/community-video-card/community-video-card.component';
 import { DetailsViewComponent } from './components/details-view/details-view.component';
-import {MatTableModule} from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
+import { UnsavedChangesDialogComponent } from './components/dialog-modal/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { PersonCreationDialogComponent } from './components/dialog-modal/person-creation-dialog/person-creation-dialog/person-creation-dialog.component';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   declarations: [
@@ -68,7 +71,9 @@ import {MatTableModule} from '@angular/material/table';
     SubTimelineComponent,
     SubtitleTileComponent,
     CommunityVideoCardComponent,
-    DetailsViewComponent
+    DetailsViewComponent,
+    UnsavedChangesDialogComponent,
+    PersonCreationDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -80,6 +85,7 @@ import {MatTableModule} from '@angular/material/table';
     MatButtonModule,
     YouTubePlayerModule,
     MatIconModule,
+    FormsModule,
     MatTooltipModule,
     FlexLayoutModule,
     MatCardModule,
@@ -97,6 +103,8 @@ import {MatTableModule} from '@angular/material/table';
     MatSnackBarModule,
     MatTableModule,
     DragDropModule,
+    MatDialogModule,
+    ColorPickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

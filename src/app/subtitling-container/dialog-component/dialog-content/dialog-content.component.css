@@ -9,7 +9,9 @@
 }
 
 .mat-mdc-card-header {
-    padding:8px 16px
+    padding:8px 16px;
+    align-items: center;
+    gap:15px;
 }
 
 .delete-action {
@@ -19,3 +21,35 @@
 .mat-mdc-card {
     margin-bottom:15px;
 }
+
+.mat-icon {
+    width:24px;
+    height:24px;
+    font-size:24px;
+}
+
+.span-color span {
+    width:24px;
+    height:24px;
+}
+.person-menu-item {
+    display: flex;
+    align-items: center;
+}
+.person-menu-item span{
+    display: inline-block;
+    width:24px;
+    height:24px;
+    border-radius: 5px;
+}
+
+.person-item{
+    display: inline-block;
+    width:20px;
+    height:20px;
+    border-radius: 5px;
+}
+
+.mat-typography {
+    margin-bottom: 0
+} 

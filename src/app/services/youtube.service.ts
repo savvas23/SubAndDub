@@ -23,10 +23,4 @@ export class YoutubeService {
       }
     ));
   }
-
-  getCaptions(videoId): void {
-    const url = `https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${GOOGLE_API_KEY}`
-
-    this.http.get(url).subscribe(res=>console.log(res))
-  }
 }

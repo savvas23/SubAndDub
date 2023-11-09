@@ -5,6 +5,9 @@ import { BehaviorSubject, take, tap } from 'rxjs';
 import { YoutubeVideoDetails } from '../models/youtube/youtube-response.model';
 import { StorageService } from '../services/storage.service';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { UnsavedChangesDialogComponent } from '../components/dialog-modal/unsaved-changes-dialog/unsaved-changes-dialog.component';
+
 
 @Component({
   selector: 'subtitling-container',
@@ -19,18 +22,23 @@ export class SubtitlingContainerComponent implements OnInit {
   videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
   videoDuration: string;
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  isFormDirty: boolean = false;
   private storage: AngularFireStorage = inject(AngularFireStorage);
 
   constructor(
     private route: ActivatedRoute,
     private router: Router, 
     private youtubeService: YoutubeService,
-    private storageService: StorageService,) { }
+    private storageService: StorageService,
+    public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.videoId = this.route.snapshot.paramMap.get('id');
     this.currentLanguage = this.route.snapshot.paramMap.get('languageCode')
-    this.youtubeService.getCaptions(this.videoId)
+  }
+
+  setFormDirtyStatus(isDirty: boolean): void {
+    this.isFormDirty = isDirty;
   }
 
   uploadToFirestorage(subtitleBlob: Blob): void {
@@ -38,7 +46,12 @@ export class SubtitlingContainerComponent implements OnInit {
   }
 
   navigateToDetails(): void {
-    this.router.navigate(['details', this.videoId]);
-
+    if (this.isFormDirty) {
+      this.dialog.open(UnsavedChangesDialogComponent, {'width' : '500px' }).afterClosed().subscribe((res) => {
+        if (res) this.router.navigate(['details', this.videoId]);
+      });
+    } else {
+      this.router.navigate(['details', this.videoId]);
+    }
   }
 }

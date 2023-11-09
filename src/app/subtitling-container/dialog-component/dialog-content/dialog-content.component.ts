@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { PersonAssign } from 'src/app/models/general/person-assign.model';
 
 @Component({
   selector: 'dialog-content',
@@ -10,10 +11,11 @@ export class DialogContentComponent {
   @Input() dialogGroup: FormGroup;
   @Input() index: number;
   @Input() dialogId: number;
+  @Input() persons: PersonAssign[];
   @Output() deleteDialogBoxEvent: EventEmitter<number> = new EventEmitter();
   @Output() dialogEmitter: EventEmitter<TimeEmitterObject> = new EventEmitter();
-
-
+  @ViewChild('assingPersoneMenu') assignPersonMenu;
+  assignedPerson: PersonAssign;
 
   getDialogControl(control: string): FormControl {
     return this.dialogGroup.get(control) as FormControl
@@ -29,6 +31,10 @@ export class DialogContentComponent {
       control: originControl
     }
     this.dialogEmitter.emit(EmitObject);
+  }
+
+  assignPerson(person: PersonAssign): void {
+    this.assignedPerson = person;
   }
 
 }
