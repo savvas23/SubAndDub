@@ -28,7 +28,6 @@ export class SubtitlingContainerComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router, 
-    private youtubeService: YoutubeService,
     private storageService: StorageService,
     public dialog: MatDialog) { }
 
@@ -43,6 +42,10 @@ export class SubtitlingContainerComponent implements OnInit {
 
   uploadToFirestorage(subtitleBlob: Blob): void {
     this.storageService.createFirestorageRef(this.storage, this.currentLanguage, subtitleBlob, this.videoId);
+  }
+
+  navigateTTS(): void {
+    this.router.navigate(['generate-tts', this.videoId, this.currentLanguage]);
   }
 
   navigateToDetails(): void {

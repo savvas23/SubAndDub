@@ -93,6 +93,13 @@
     border-radius: 5px;
 }
 
+.header-assigment-ribbon {
+    display:inline-block;
+    width:100%;
+    height: 4px;
+    border-radius: 90%;
+}
+
 .mat-typography {
     margin-bottom: 0
 } 

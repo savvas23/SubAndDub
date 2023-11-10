@@ -7,7 +7,9 @@
     <div class="wrapper">
         <video-player [videoId]="videoId"></video-player>
         <dialog-component (subtitleUploadEmitter)="uploadToFirestorage($event)"
-        (formStatusChange)="setFormDirtyStatus($event)"></dialog-component>
+            (navigateTTS)="navigateTTS()"
+            (formStatusChange)="setFormDirtyStatus($event)">
+        </dialog-component>
     </div>
 <!-- <sub-timeline [videoDurationISO]="videoDuration"></sub-timeline> -->
 </div>

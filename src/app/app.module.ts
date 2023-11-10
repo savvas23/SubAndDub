@@ -49,6 +49,9 @@ import { MatTableModule } from '@angular/material/table';
 import { UnsavedChangesDialogComponent } from './components/dialog-modal/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { PersonCreationDialogComponent } from './components/dialog-modal/person-creation-dialog/person-creation-dialog/person-creation-dialog.component';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { GenerateVoiceDialogComponent } from './components/dialog-modal/generate-voice-modal/genereate-voice-modal.component';
+import { GenerateTTSComponent } from './components/generate-tts/generate-tts/generate-tts.component';
+import {MatStepperModule} from '@angular/material/stepper';
 
 @NgModule({
   declarations: [
@@ -73,7 +76,9 @@ import { ColorPickerModule } from 'ngx-color-picker';
     CommunityVideoCardComponent,
     DetailsViewComponent,
     UnsavedChangesDialogComponent,
-    PersonCreationDialogComponent
+    PersonCreationDialogComponent,
+    GenerateVoiceDialogComponent,
+    GenerateTTSComponent
   ],
   imports: [
     BrowserModule,
@@ -104,7 +109,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
     MatTableModule,
     DragDropModule,
     MatDialogModule,
-    ColorPickerModule
+    ColorPickerModule,
+    MatStepperModule
   ],
   providers: [],
   bootstrap: [AppComponent]

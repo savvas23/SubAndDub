@@ -5,7 +5,7 @@
             matTooltip="Add Dialog Box"><mat-icon>add</mat-icon>
         </button>
         <button mat-icon-button color="primary"
-            matTooltip="Translate your text"
+            matTooltip="Translate all subtitles"
             [matMenuTriggerFor]="translateMenu">
             <mat-icon>g_translate</mat-icon>
         </button>
@@ -30,6 +30,7 @@
        <button (click)="openPersonCreationModal()" mat-icon-button color="primary" matTooltip="Add Person (Character/Voice actor) & assign them to subtitles">
             <mat-icon>person_add</mat-icon>
         </button>
+        <button (click)="generateSpeechInit()" mat-icon-button color="primary" matTooltip="Generete Voices/Speech for your subtitles"><mat-icon>record_voice_over</mat-icon></button>
     </div>
     <div class="main-content_wrapper">
         <dialog-content *ngFor="let dialogBox of dialogBoxes; let dialogIndex = index"

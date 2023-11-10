@@ -14,6 +14,9 @@ import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/share
 import { PersonAssign } from 'src/app/models/general/person-assign.model';
 import { MatDialog } from '@angular/material/dialog';
 import { PersonCreationDialogComponent } from 'src/app/components/dialog-modal/person-creation-dialog/person-creation-dialog/person-creation-dialog.component';
+import { TextContentToSSML } from 'src/app/models/general/gpt-feed.model';
+import { GenerateVoiceDialogComponent } from 'src/app/components/dialog-modal/generate-voice-modal/genereate-voice-modal.component';
+import { TextToSpeechService } from 'src/app/services/text-to-speech-service.service';
 
 @Component({
   selector: 'dialog-component',
@@ -31,10 +34,14 @@ export class DialogComponentComponent implements OnInit {
   public persons: PersonAssign[];
   @Output() subtitleUploadEmitter: EventEmitter<Blob> = new EventEmitter<Blob>();
   @Output() formStatusChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() navigateTTS: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('translateMenu') translateMenu;
 
   public dialogBoxes: DialogBox[] = [{
-    id: 1
+    id: 1,
+    text: '',
+    start_time: '',
+    end_time: ''
   }];
 
   get supportedLanguages$(): Observable<SupportedLanguages> {
@@ -44,7 +51,8 @@ export class DialogComponentComponent implements OnInit {
   constructor(private fb: FormBuilder,
     private fileService: UploadFileHandlerService,
     private google: GoogleTranslateService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private ttsService: TextToSpeechService
     ) {}
 
   ngOnInit(): void {
@@ -80,7 +88,10 @@ export class DialogComponentComponent implements OnInit {
     }));
 
     this.dialogBoxes.push({
-      id: this.dialogBoxId
+      id: this.dialogBoxId,
+      text: value?.subtitleText,
+      start_time: value?.start_time,
+      end_time: value?.end_time
     });
   }
 
@@ -271,6 +282,28 @@ export class DialogComponentComponent implements OnInit {
     for (let individualSub of cleanArray) {
       this.addDialogBox(individualSub);
     }
+  }
+
+  generateSpeechInit(): void {
+    this.dialog.open(GenerateVoiceDialogComponent,{width:'500px'}).afterClosed().subscribe((res: boolean)=> {
+      if (res) {
+        let contentToSpeech: TextContentToSSML[] = [];
+        Object.keys(this.form.controls).forEach(control => {
+        const startTime = parseTimestamp(this.form.get(control).get('start_time').value)
+        const endTime = parseTimestamp(this.form.get(control).get('end_time').value)
+
+        const controlContent: TextContentToSSML = {
+          text: this.form.get(control).get('subtitles').value,
+          totalDuration: Math.floor((calculateSeconds(endTime) - calculateSeconds(startTime)) * 1000) + 'ms',
+          start_time: this.form.get(control).get('start_time').value,
+          end_time: this.form.get(control).get('end_time').value
+        };
+        contentToSpeech.push(controlContent);
+        });
+        this.ttsService.set_initContentSSML(contentToSpeech);
+        this.navigateTTS.emit();
+      }
+    });
   }
 
 }

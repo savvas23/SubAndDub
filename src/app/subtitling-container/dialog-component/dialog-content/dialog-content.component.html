@@ -1,7 +1,11 @@
 <mat-card>
+  <span class="header-assigment-ribbon" *ngIf="assignedPerson" [style.background]="assignedPerson.color"></span>
     <mat-card-header>
       <mat-card-title>Subtitle {{index + 1}}</mat-card-title>
       <mat-icon class="estimation-icon" [matTooltip]="estimationTooltip">{{estimationIcon}}</mat-icon>
+      <button mat-icon-button matTooltip="Translate this subtitle">
+        <mat-icon>g_translate</mat-icon>
+      </button>
       <button mat-icon-button matTooltip="Assign Person to this subtitle"
         [matMenuTriggerFor]="assignPersonMenu">
         <mat-icon>person</mat-icon>
@@ -13,14 +17,14 @@
             <span [style.background]="person.color"></span>
           </div>
         </ng-container>
-      <ng-template #noPersons>
-          <p class="mat-typography">No persons created yet.</p>
-      </ng-template>
-    </mat-menu>
-    <ng-container *ngIf="assignedPerson">
-      <h3 class="mat-typography">{{assignedPerson.name}}</h3>
-      <span class="person-item" [style.background]="assignedPerson.color"></span>
-    </ng-container>
+        <ng-template #noPersons>
+          <p class="mat-typography" [style.padding]="'5px'">No persons created yet.</p>
+        </ng-template>
+      </mat-menu>
+      <ng-container *ngIf="assignedPerson">
+        <h3 class="mat-typography">{{assignedPerson.name}}</h3>
+        <span class="person-item" [style.background]="assignedPerson.color"></span>
+      </ng-container>
       <button (click)="deleteDialogBox(dialogId)" class="delete-action" mat-icon-button matTooltip="Delete Subtitle">
         <mat-icon>delete</mat-icon>
       </button>
