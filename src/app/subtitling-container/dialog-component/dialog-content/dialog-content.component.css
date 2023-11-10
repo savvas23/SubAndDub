@@ -11,7 +11,7 @@
 .mat-mdc-card-header {
     padding:8px 16px;
     align-items: center;
-    gap:10px;
+    gap:15px;
 }
 
 .delete-action {
@@ -27,3 +27,72 @@
     padding-left:16px;
     padding-bottom:4px;
 }
+
+.mat-mdc-card-subtitle {
+    padding-top:4px;
+    padding-left:16px;
+    padding-bottom:4px;
+}
+.mat-icon {
+    width:24px;
+    height:24px;
+    font-size:24px;
+}
+
+.span-color span {
+    width:24px;
+    height:24px;
+}
+.person-menu-item {
+    display: flex;
+    align-items: center;
+}
+.person-menu-item span{
+    display: inline-block;
+    width:24px;
+    height:24px;
+    border-radius: 5px;
+}
+
+.person-item{
+    display: inline-block;
+    width:20px;
+    height:20px;
+    border-radius: 5px;
+}
+
+.mat-typography {
+    margin-bottom: 0
+} 
+
+.mat-icon {
+    width:24px;
+    height:24px;
+    font-size:24px;
+}
+
+.span-color span {
+    width:24px;
+    height:24px;
+}
+.person-menu-item {
+    display: flex;
+    align-items: center;
+}
+.person-menu-item span{
+    display: inline-block;
+    width:24px;
+    height:24px;
+    border-radius: 5px;
+}
+
+.person-item{
+    display: inline-block;
+    width:20px;
+    height:20px;
+    border-radius: 5px;
+}
+
+.mat-typography {
+    margin-bottom: 0
+} 

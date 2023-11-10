@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { calculateSeconds, parseTimestamp } from '../dialog-component.component';
+import { PersonAssign } from 'src/app/models/general/person-assign.model';
+import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/shared-functions';
 
 @Component({
   selector: 'dialog-content',
@@ -11,8 +12,11 @@ export class DialogContentComponent {
   @Input() dialogGroup: FormGroup;
   @Input() index: number;
   @Input() dialogId: number;
+  @Input() persons: PersonAssign[];
   @Output() deleteDialogBoxEvent: EventEmitter<number> = new EventEmitter();
   @Output() dialogEmitter: EventEmitter<TimeEmitterObject> = new EventEmitter();
+  @ViewChild('assingPersoneMenu') assignPersonMenu;
+  assignedPerson: PersonAssign;
   wordCount: number = 0;
   characterCount: number = 0;
   timingEstimation: number = 0;
@@ -33,6 +37,10 @@ export class DialogContentComponent {
       control: originControl
     }
     this.dialogEmitter.emit(EmitObject);
+  }
+
+  assignPerson(person: PersonAssign): void {
+    this.assignedPerson = person;
   }
 
   wordCounter(): void {

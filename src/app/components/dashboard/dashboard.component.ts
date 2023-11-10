@@ -33,7 +33,6 @@ export class DashboardComponent implements OnInit {
   videoSelectedId: string;
   apiLoaded = false;
   @ViewChild('userVideosContainer') userVideosContainer: ElementRef
-  private storage: AngularFireStorage = inject(AngularFireStorage);
 
   constructor(private auth: AuthService, 
     private dashboardService: DashboardService, 

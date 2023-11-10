@@ -2,7 +2,28 @@
     <mat-card-header>
       <mat-card-title>Subtitle {{index + 1}}</mat-card-title>
       <mat-icon class="estimation-icon" [matTooltip]="estimationTooltip">{{estimationIcon}}</mat-icon>
-      <mat-icon class="delete-action" (click)="deleteDialogBox(dialogId)" matTooltip="Delete Subtitle">delete</mat-icon>
+      <button mat-icon-button matTooltip="Assign Person to this subtitle"
+        [matMenuTriggerFor]="assignPersonMenu">
+        <mat-icon>person</mat-icon>
+      </button>
+      <mat-menu #assignPersonMenu="matMenu">
+        <ng-container *ngIf="persons; else noPersons">
+          <div *ngFor="let person of persons" class="person-menu-item" mat-menu-item (click)="assignPerson(person)">
+            <p class="mat-typography">{{person.name}}</p>
+            <span [style.background]="person.color"></span>
+          </div>
+        </ng-container>
+      <ng-template #noPersons>
+          <p class="mat-typography">No persons created yet.</p>
+      </ng-template>
+    </mat-menu>
+    <ng-container *ngIf="assignedPerson">
+      <h3 class="mat-typography">{{assignedPerson.name}}</h3>
+      <span class="person-item" [style.background]="assignedPerson.color"></span>
+    </ng-container>
+      <button (click)="deleteDialogBox(dialogId)" class="delete-action" mat-icon-button matTooltip="Delete Subtitle">
+        <mat-icon>delete</mat-icon>
+      </button>
     </mat-card-header>
     <mat-card-content>
         <mat-form-field subscriptSizing="dynamic">

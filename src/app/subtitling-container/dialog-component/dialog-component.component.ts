@@ -1,6 +1,6 @@
-import { Component, OnInit,ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Component, EventEmitter, OnInit,Output,ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { BehaviorSubject, Observable, takeUntil, takeWhile, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/general/dialog-box.model';
 import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
 import { ImportModel } from 'src/app/models/general/import-sbv.model';
@@ -8,9 +8,12 @@ import { GoogleTranslateService } from 'src/app/services/googletranslate.service
 import { UploadFileHandlerService } from 'src/app/services/upload-file-handler.service';
 import { GoogleTranslateResponse, GoogleTranslations} from 'src/app/models/google/google-translate-response'
 import { SupportedLanguages } from 'src/app/models/google/google-supported-languages';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeFormat } from 'src/app/models/general/time-format.model';
 import { TimeEmitterObject } from './dialog-content/dialog-content.component';
+import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/shared-functions';
+import { PersonAssign } from 'src/app/models/general/person-assign.model';
+import { MatDialog } from '@angular/material/dialog';
+import { PersonCreationDialogComponent } from 'src/app/components/dialog-modal/person-creation-dialog/person-creation-dialog/person-creation-dialog.component';
 
 @Component({
   selector: 'dialog-component',
@@ -22,14 +25,17 @@ export class DialogComponentComponent implements OnInit {
   public dialogBoxId: number = 1;
   public _supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
   public _translatedText$: BehaviorSubject<GoogleTranslateResponse> = new BehaviorSubject<GoogleTranslateResponse>(null);
+  public currentSelectedLanguage: string;
   protected loading: boolean;
+  public form: FormGroup;
+  public persons: PersonAssign[];
+  @Output() subtitleUploadEmitter: EventEmitter<Blob> = new EventEmitter<Blob>();
+  @Output() formStatusChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @ViewChild('translateMenu') translateMenu;
 
   public dialogBoxes: DialogBox[] = [{
     id: 1
   }];
-
-  public form: FormGroup;
 
   get supportedLanguages$(): Observable<SupportedLanguages> {
     return this._supportedLanguages$;
@@ -37,16 +43,26 @@ export class DialogComponentComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
     private fileService: UploadFileHandlerService,
-    private google: GoogleTranslateService) {}
+    private google: GoogleTranslateService,
+    public dialog: MatDialog
+    ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      '1-dialogBox': this.fb.group({
-        subtitles: this.fb.control(''),
-        start_time: this.fb.control('00:00:00.000'),
-        end_time: this.fb.control('00:00:02.000'),
-      }),
-    });
+        '1-dialogBox': this.fb.group({
+          subtitles: this.fb.control(''),
+          start_time: this.fb.control('00:00:00.000'),
+          end_time: this.fb.control('00:00:02.000'),
+        })
+      });
+    // Subscribe to form status changes
+    this.form.statusChanges.pipe().subscribe(() => {
+        const isDirty = this.form.dirty;
+        if (isDirty) {
+          this.formStatusChange.emit(isDirty);
+        }
+      }
+    );
 
     this.getSupportedLanguages();
   }
@@ -208,13 +224,29 @@ export class DialogComponentComponent implements OnInit {
     });
   }
 
-  downloadSubtitle(): void {
+  openPersonCreationModal(): void {
+    this.dialog.open(PersonCreationDialogComponent, {'width': '500px', data: this.persons}).afterClosed()
+    .subscribe((data: PersonAssign[]) => {
+      if (data) this.persons = data;
+    });
+  }
+
+  uploadSubtitle(): void {
+    this.subtitleUploadEmitter.emit(this.createSubtitleBlob());
+  }
+
+  createSubtitleBlob(): Blob {
     let sbvContent = ''
     Object.keys(this.form.controls).forEach((control) => {
       const currentGroup = this.form.get(control);
       sbvContent += `${currentGroup.get('start_time').value},${currentGroup.get('end_time').value}\n${currentGroup.get('subtitles').value}\n\n`;
     });
     const blob = new Blob([sbvContent], { type: 'text/sbv' });
+    return blob;
+  }
+
+  downloadSubtitle(): void {
+    const blob = this.createSubtitleBlob()
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -223,7 +255,6 @@ export class DialogComponentComponent implements OnInit {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-    console.log(sbvContent)
   }
 
   handleFileUpload(event: BehaviorSubject<string | ArrayBuffer>): void {
@@ -242,22 +273,4 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
-}
-
-export function parseTimestamp(value: string): TimeFormat {
-  const parts = value.split(':');
-  const [seconds, milliseconds] = parts[2].split('.');
-  
-  const timeformatObject: TimeFormat = {
-    hour: parseInt(parts[0], 10),
-    minute: parseInt(parts[1], 10),
-    seconds: parseInt(seconds, 10),
-    ms: parseInt(milliseconds, 10)
-  };
-  
-  return timeformatObject;
-}
-
-export function calculateSeconds(timeFormat: TimeFormat): number {
-  return (timeFormat.hour * 60 * 60) + (timeFormat.minute * 60) + timeFormat.seconds + (timeFormat.ms/1000);
 }
