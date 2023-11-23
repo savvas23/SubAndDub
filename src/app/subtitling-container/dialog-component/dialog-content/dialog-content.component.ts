@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Observable } from 'rxjs';
 import { PersonAssign } from 'src/app/models/general/person-assign.model';
+import { Language, Languages, SupportedLanguages } from 'src/app/models/google/google-supported-languages';
 import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/shared-functions';
 
 @Component({
@@ -13,8 +15,13 @@ export class DialogContentComponent {
   @Input() index: number;
   @Input() dialogId: number;
   @Input() persons: PersonAssign[];
+  @Input() supportedLanguages: Language[]
   @Output() deleteDialogBoxEvent: EventEmitter<number> = new EventEmitter();
   @Output() dialogEmitter: EventEmitter<TimeEmitterObject> = new EventEmitter();
+  @Output() translateSubtitle: EventEmitter<{lang: string, id: number}> = new EventEmitter();
+
+  @ViewChild('translateMenu') translateMenu;
+
   @ViewChild('assingPersoneMenu') assignPersonMenu;
   assignedPerson: PersonAssign;
   wordCount: number = 0;
@@ -41,6 +48,10 @@ export class DialogContentComponent {
 
   assignPerson(person: PersonAssign): void {
     this.assignedPerson = person;
+  }
+
+  translateSub(lang: string): void {
+    this.translateSubtitle.emit({lang: lang, id: this.dialogId });
   }
 
   wordCounter(): void {

@@ -119,7 +119,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getVideoDetailsById(videoId: string): YoutubeVideoDetails {
-    return this.youtubeVideoDetails.find((videoDetail) => videoDetail.id === videoId);
+    return this.youtubeVideoDetails.find(videoDetail => videoDetail.id === videoId);
   }
 
   addVideoToUserCollection(videoDetails: string): void {
@@ -138,11 +138,12 @@ export class DashboardComponent implements OnInit {
 
   iframeURL(): SafeResourceUrl {
     const url = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoSelectedId + '?autoplay=1');
-    console.log(url)
     return url;
   }
 
+  search(value: string): void {
 
+  }
   changeToListView(): void {
     this.listView = true;
     this.videoSelectedId = null;

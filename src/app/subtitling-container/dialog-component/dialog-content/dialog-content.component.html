@@ -3,9 +3,16 @@
     <mat-card-header>
       <mat-card-title>Subtitle {{index + 1}}</mat-card-title>
       <mat-icon class="estimation-icon" [matTooltip]="estimationTooltip">{{estimationIcon}}</mat-icon>
-      <button mat-icon-button matTooltip="Translate this subtitle">
+      <button mat-icon-button matTooltip="Translate this subtitle"
+        [matMenuTriggerFor]="translateMenu">
         <mat-icon>g_translate</mat-icon>
       </button>
+      <mat-menu #translateMenu="matMenu">
+            <p mat-menu-item *ngFor="let language of (supportedLanguages)"
+            (click)="translateSub(language.language)">
+                {{language.name}}
+            </p>
+    </mat-menu>
       <button mat-icon-button matTooltip="Assign Person to this subtitle"
         [matMenuTriggerFor]="assignPersonMenu">
         <mat-icon>person</mat-icon>

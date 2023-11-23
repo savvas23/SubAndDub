@@ -7,6 +7,7 @@ import { StorageService } from '../services/storage.service';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from '../components/dialog-modal/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { UploadSubtitle } from './dialog-component/dialog-component.component';
 
 
 @Component({
@@ -40,8 +41,9 @@ export class SubtitlingContainerComponent implements OnInit {
     this.isFormDirty = isDirty;
   }
 
-  uploadToFirestorage(subtitleBlob: Blob): void {
-    this.storageService.createFirestorageRef(this.storage, this.currentLanguage, subtitleBlob, this.videoId);
+  uploadToFirestorage(subtitle: UploadSubtitle): void {
+    this.storageService.createFirestorageRef(this.storage, this.currentLanguage, subtitle, this.videoId);
+    this.isFormDirty = false;
   }
 
   navigateTTS(): void {

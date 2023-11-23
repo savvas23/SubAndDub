@@ -6,7 +6,7 @@ import { GoogleTranslateRequestObject } from 'src/app/models/google/google-trans
 import { ImportModel } from 'src/app/models/general/import-sbv.model';
 import { GoogleTranslateService } from 'src/app/services/googletranslate.service';
 import { UploadFileHandlerService } from 'src/app/services/upload-file-handler.service';
-import { GoogleTranslateResponse, GoogleTranslations} from 'src/app/models/google/google-translate-response'
+import { GoogleTranslateResponse, GoogleTranslations, ResponseObject} from 'src/app/models/google/google-translate-response'
 import { SupportedLanguages } from 'src/app/models/google/google-supported-languages';
 import { TimeFormat } from 'src/app/models/general/time-format.model';
 import { TimeEmitterObject } from './dialog-content/dialog-content.component';
@@ -17,7 +17,7 @@ import { PersonCreationDialogComponent } from 'src/app/components/dialog-modal/p
 import { TextContentToSSML } from 'src/app/models/general/gpt-feed.model';
 import { GenerateVoiceDialogComponent } from 'src/app/components/dialog-modal/generate-voice-modal/genereate-voice-modal.component';
 import { TextToSpeechService } from 'src/app/services/text-to-speech-service.service';
-
+import { SaveSubtitleDialogComponent } from 'src/app/components/dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
 @Component({
   selector: 'dialog-component',
   templateUrl: './dialog-component.component.html',
@@ -32,7 +32,7 @@ export class DialogComponentComponent implements OnInit {
   protected loading: boolean;
   public form: FormGroup;
   public persons: PersonAssign[];
-  @Output() subtitleUploadEmitter: EventEmitter<Blob> = new EventEmitter<Blob>();
+  @Output() subtitleUploadEmitter: EventEmitter<UploadSubtitle> = new EventEmitter<UploadSubtitle>();
   @Output() formStatusChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() navigateTTS: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('translateMenu') translateMenu;
@@ -191,7 +191,7 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
-  translateSubtitles(targetLanguage: string): void {
+  translateAllSubtitles(targetLanguage: string): void {
     let translationObject: GoogleTranslateRequestObject = {
       q: [],
       target: targetLanguage
@@ -224,6 +224,21 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
+  translateSingleSubtitle(targetLanguage: {lang: string, id: number}): void {
+    let translationObject: GoogleTranslateRequestObject = {
+      q: [this.form.get(targetLanguage.id + '-dialogBox').get('subtitles').value],
+      target: targetLanguage.lang
+    };
+
+    this.google.translate(translationObject).subscribe((response: ResponseObject) => {
+      if (response) {
+        this.form.get(targetLanguage.id + '-dialogBox').get('subtitles').setValue(response.data.translations[0].translatedText);
+      }
+
+    })
+
+  }
+
   getSupportedLanguages(): void {
     this.google.getSupportedLanguages()
     .pipe(tap(() => {
@@ -243,7 +258,9 @@ export class DialogComponentComponent implements OnInit {
   }
 
   uploadSubtitle(): void {
-    this.subtitleUploadEmitter.emit(this.createSubtitleBlob());
+    this.dialog.open(SaveSubtitleDialogComponent,{width:'500px'}).afterClosed().subscribe(name => {
+      if (name) this.subtitleUploadEmitter.emit({content: this.createSubtitleBlob(), file_name: name});
+    })
   }
 
   createSubtitleBlob(): Blob {
@@ -306,4 +323,9 @@ export class DialogComponentComponent implements OnInit {
     });
   }
 
+}
+
+export interface UploadSubtitle {
+  content: Blob;
+  file_name: string
 }

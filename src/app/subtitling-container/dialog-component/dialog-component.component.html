@@ -13,7 +13,7 @@
                 <sd-loader *ngIf="loading; else loadingComplete"></sd-loader>
                 <ng-template #loadingComplete>
                     <p mat-menu-item *ngFor="let language of (supportedLanguages$ | async)?.data?.languages"
-                    (click)="translateSubtitles(language.language)">
+                    (click)="translateAllSubtitles(language.language)">
                         {{language.name}}
                     </p>
                 </ng-template>
@@ -38,6 +38,8 @@
         [index]="dialogIndex"
         [dialogId]="dialogBox.id"
         [persons]="persons"
+        [supportedLanguages]="(supportedLanguages$ | async)?.data?.languages"
+        (translateSubtitle)="translateSingleSubtitle($event)"
         (deleteDialogBoxEvent)="deleteDialogBox($event)"
         (dialogEmitter)="timeRangeValidation($event)">
         </dialog-content>

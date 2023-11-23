@@ -4,6 +4,10 @@
         <button mat-mini-fab color="primary"
            (click)="openDialog()" matTooltip="Add New video"><mat-icon>add</mat-icon>
         </button>
+        <mat-form-field>
+            <mat-label>Search</mat-label>
+            <input matInput #searchInput (input)="search(searchInput.value)">
+        </mat-form-field>
         <div class="view-switch">
             <button mat-icon-button matTooltip="List View" (click)="changeToListView()"><mat-icon>dehaze</mat-icon></button>
             <button mat-icon-button matTooltip="Grid View" (click)="changeToGridView()"><mat-icon>grid_on</mat-icon></button>
@@ -16,13 +20,13 @@
                 <h3>No videos found, click on the + button to get started!</h3>
             </div>
             <ng-template #videos>
-                <div class="video" *ngFor="let video of userVideos$ | async">
-                    <video-card *ngIf="youtubeVideoDetails" [videoId]="video.videoId"
+                <div class="video" *ngFor="let video of youtubeVideoDetails | filter: searchInput.value">
+                    <video-card *ngIf="youtubeVideoDetails" [videoId]="video.id"
                     (editVideoEmitter)="navigateToDetailsView($event)"
                     (deleteVideoEmitter)="deleteVideoPrompt($event)"
                     (requestCommunityHelpEmitter)="requestCommunityHelp($event)"
                     (videoIdEmitter)="previewVideo($event)"
-                    [videoDetails]="getVideoDetailsById(video.videoId)"></video-card>
+                    [videoDetails]="getVideoDetailsById(video.id)"></video-card>
                 </div>            
             </ng-template>            
         </div>

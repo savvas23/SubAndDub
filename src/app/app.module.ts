@@ -52,6 +52,9 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { GenerateVoiceDialogComponent } from './components/dialog-modal/generate-voice-modal/genereate-voice-modal.component';
 import { GenerateTTSComponent } from './components/generate-tts/generate-tts/generate-tts.component';
 import {MatStepperModule} from '@angular/material/stepper';
+import { FilterPipe } from './shared/pipes/search-filter.pipe';
+import {MatSelectModule} from '@angular/material/select';
+import { SaveSubtitleDialogComponent } from './components/dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
 
 @NgModule({
   declarations: [
@@ -78,7 +81,9 @@ import {MatStepperModule} from '@angular/material/stepper';
     UnsavedChangesDialogComponent,
     PersonCreationDialogComponent,
     GenerateVoiceDialogComponent,
-    GenerateTTSComponent
+    GenerateTTSComponent,
+    FilterPipe,
+    SaveSubtitleDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -110,7 +115,8 @@ import {MatStepperModule} from '@angular/material/stepper';
     DragDropModule,
     MatDialogModule,
     ColorPickerModule,
-    MatStepperModule
+    MatStepperModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]
