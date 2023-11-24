@@ -6,7 +6,11 @@
     </div>
     <div class="wrapper">
         <video-player [videoId]="videoId"></video-player>
-        <dialog-component (subtitleUploadEmitter)="uploadToFirestorage($event)"
+        <dialog-component
+            [isoCode]="currentLanguage"
+            [videoId]="videoId"
+            [subtitleName]="fileName"
+            (subtitleUploadEmitter)="uploadToFirestorage($event)"
             (navigateTTS)="navigateTTS()"
             (formStatusChange)="setFormDirtyStatus($event)">
         </dialog-component>

@@ -11,9 +11,13 @@
 			</div>
 			<div class="channel-name">{{videoDetails?.snippet?.channelTitle}}</div>
 			<div class="views">
-				<span id="views">{{videoDetails?.statistics?.viewCount | number }} views</span> ·
-				<span>requested by {{communityRequestDetails.requestedBy}}</span>
+				<span id="views">{{videoDetails?.statistics?.viewCount | number }} views</span>
+				<div>
+					<span>Language: {{communityRequestDetails.language}}</span>
+				</div>
+				<span>Requested by <b>{{communityRequestDetails.requestedBy}}</b></span>
         	</div>
+
 		</div>
 	</div>
 	<div class="actions">

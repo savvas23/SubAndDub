@@ -1,6 +1,6 @@
-import { Component, EventEmitter, OnInit,Output,ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit,Output,ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { BehaviorSubject, Observable, takeUntil, takeWhile, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/general/dialog-box.model';
 import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
 import { ImportModel } from 'src/app/models/general/import-sbv.model';
@@ -17,22 +17,29 @@ import { PersonCreationDialogComponent } from 'src/app/components/dialog-modal/p
 import { TextContentToSSML } from 'src/app/models/general/gpt-feed.model';
 import { GenerateVoiceDialogComponent } from 'src/app/components/dialog-modal/generate-voice-modal/genereate-voice-modal.component';
 import { TextToSpeechService } from 'src/app/services/text-to-speech-service.service';
-import { SaveSubtitleDialogComponent } from 'src/app/components/dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
+import { ActivatedRoute } from '@angular/router';
+import { StorageService } from 'src/app/services/storage.service';
+import { AuthService } from 'src/app/services/auth.service';
+
 @Component({
   selector: 'dialog-component',
   templateUrl: './dialog-component.component.html',
   styleUrls: ['./dialog-component.component.css'],
-  providers: [UploadFileHandlerService, GoogleTranslateService]
+  providers: [UploadFileHandlerService, GoogleTranslateService, StorageService]
 })
 export class DialogComponentComponent implements OnInit {
   public dialogBoxId: number = 1;
   public _supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
   public _translatedText$: BehaviorSubject<GoogleTranslateResponse> = new BehaviorSubject<GoogleTranslateResponse>(null);
+  public subtitles$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
   public currentSelectedLanguage: string;
   protected loading: boolean;
   public form: FormGroup;
   public persons: PersonAssign[];
-  @Output() subtitleUploadEmitter: EventEmitter<UploadSubtitle> = new EventEmitter<UploadSubtitle>();
+  @Input() subtitleName: string;
+  @Input() videoId: string;
+  @Input() isoCode: string;
+  @Output() subtitleUploadEmitter: EventEmitter<Blob> = new EventEmitter<Blob>();
   @Output() formStatusChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() navigateTTS: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('translateMenu') translateMenu;
@@ -50,27 +57,38 @@ export class DialogComponentComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
     private fileService: UploadFileHandlerService,
+    private storage: StorageService,
+    private userService: AuthService,
     private google: GoogleTranslateService,
     public dialog: MatDialog,
     private ttsService: TextToSpeechService
     ) {}
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-        '1-dialogBox': this.fb.group({
-          subtitles: this.fb.control(''),
-          start_time: this.fb.control('00:00:00.000'),
-          end_time: this.fb.control('00:00:02.000'),
+
+    this.storage.getSubtitleURL(this.videoId, this.isoCode, this.subtitleName).pipe(take(1)).subscribe(url => {
+      if (url) {
+        this.storage.fetchSubtitleFile(url).subscribe((res: string) => {
+          this.subtitles$.next(res)
+          this.handleFileUpload(this.subtitles$);
         })
-      });
+      }
+    });
+
+    this.form = this.fb.group({
+      '1-dialogBox': this.fb.group({
+        subtitles: this.fb.control(''),
+        start_time: this.fb.control('00:00:00.000'),
+        end_time: this.fb.control('00:00:02.000'),
+        })
+    });
     // Subscribe to form status changes
     this.form.statusChanges.pipe().subscribe(() => {
-        const isDirty = this.form.dirty;
-        if (isDirty) {
-          this.formStatusChange.emit(isDirty);
-        }
+      const isDirty = this.form.dirty;
+      if (isDirty) {
+        this.formStatusChange.emit(isDirty);
       }
-    );
+    });
 
     this.getSupportedLanguages();
   }
@@ -258,9 +276,8 @@ export class DialogComponentComponent implements OnInit {
   }
 
   uploadSubtitle(): void {
-    this.dialog.open(SaveSubtitleDialogComponent,{width:'500px'}).afterClosed().subscribe(name => {
-      if (name) this.subtitleUploadEmitter.emit({content: this.createSubtitleBlob(), file_name: name});
-    })
+    this.subtitleUploadEmitter.emit(this.createSubtitleBlob());
+ 
   }
 
   createSubtitleBlob(): Blob {
@@ -269,7 +286,7 @@ export class DialogComponentComponent implements OnInit {
       const currentGroup = this.form.get(control);
       sbvContent += `${currentGroup.get('start_time').value},${currentGroup.get('end_time').value}\n${currentGroup.get('subtitles').value}\n\n`;
     });
-    const blob = new Blob([sbvContent], { type: 'text/sbv' });
+    const blob = new Blob([sbvContent], { type: 'text/sbv;charset=utf8'});
     return blob;
   }
 

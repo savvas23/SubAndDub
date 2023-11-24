@@ -14,7 +14,7 @@ const routes: Routes = [
   {path: '', component: SignInComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectLoggedInToDashboard }},
   {path: 'dashboard', component: DashboardComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectUnauthorizedToLogin }},
   {path: 'details/:id', component: DetailsViewComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectUnauthorizedToLogin }},
-  {path: 'edit/:id/:languageCode', component: SubtitlingContainerComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectUnauthorizedToLogin }},
+  {path: 'edit/:id/:languageCode/:name', component: SubtitlingContainerComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectUnauthorizedToLogin }},
   {path: 'generate-tts/:id/:languageCode', component: GenerateTTSComponent, canActivate: [AngularFireAuthGuard], data:{ authGuardPipe: redirectUnauthorizedToLogin }}
 ]
 

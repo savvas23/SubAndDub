@@ -20,6 +20,7 @@ export class SubtitlingContainerComponent implements OnInit {
 
   videoId: string;
   currentLanguage: string;
+  fileName: string;
   videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
   videoDuration: string;
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
@@ -34,16 +35,17 @@ export class SubtitlingContainerComponent implements OnInit {
 
   ngOnInit(): void {
     this.videoId = this.route.snapshot.paramMap.get('id');
-    this.currentLanguage = this.route.snapshot.paramMap.get('languageCode')
+    this.currentLanguage = this.route.snapshot.paramMap.get('languageCode');
+    this.fileName = this.route.snapshot.paramMap.get('name');
   }
 
   setFormDirtyStatus(isDirty: boolean): void {
     this.isFormDirty = isDirty;
   }
 
-  uploadToFirestorage(subtitle: UploadSubtitle): void {
-    this.storageService.createFirestorageRef(this.storage, this.currentLanguage, subtitle, this.videoId);
+  uploadToFirestorage(subtitle: Blob): void {
     this.isFormDirty = false;
+    this.storageService.createFirestorageRef(this.storage, this.currentLanguage, subtitle, this.videoId, this.fileName);
   }
 
   navigateTTS(): void {

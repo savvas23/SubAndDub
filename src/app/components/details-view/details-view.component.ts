@@ -1,4 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, of, switchMap, take, tap } from 'rxjs';
 import { Language, SupportedLanguages } from 'src/app/models/google/google-supported-languages';
@@ -7,6 +9,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { DetailsViewServiceService } from 'src/app/services/details-view-service.service';
 import { GoogleTranslateService } from 'src/app/services/googletranslate.service';
 import { YoutubeService } from 'src/app/services/youtube.service';
+import { SaveSubtitleDialogComponent } from '../dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
+import { GmailUser } from 'src/app/models/firestore-schema/user.model';
 
 @Component({
   selector: 'details-view',
@@ -19,15 +23,17 @@ export class DetailsViewComponent implements OnInit {
   videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
   supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
-  userId$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  dataSource: Language[];
+  user$: BehaviorSubject<GmailUser> = new BehaviorSubject<GmailUser>(null);
+  dataSource: any[];
 
   @ViewChild('translateMenu') translateMenu;
 
-  displayedColumns = ['Language', 'Last Updated', 'Subtitles'];
+  displayedColumns = ['Name','Format','Language','Last Updated','Subtitles'];
   constructor(private route: ActivatedRoute, 
     private router: Router,
     private youtubeService: YoutubeService,
+    public dialog: MatDialog,
+    private snackbar: MatSnackBar,
     private authService: AuthService,
     private translateService: GoogleTranslateService,
     private detailsViewService: DetailsViewServiceService) { }
@@ -38,8 +44,8 @@ export class DetailsViewComponent implements OnInit {
     this.authService.user.pipe(take(1),
       switchMap(user => {
         if (user) {
-          this.userId$.next(user.uid);
-          return this.detailsViewService.getSubtitleLanguages(this.userId$.value, this.videoId);
+          this.user$.next(user);
+          return this.detailsViewService.getSubtitleLanguages(this.user$.value.uid, this.videoId);
         } else {
           return of(null); // Return an empty observable if there is no user
         }
@@ -70,16 +76,21 @@ export class DetailsViewComponent implements OnInit {
       this.supportedLanguages$.next(response);
       this.loading$.next(false)
     });
-    
-    console.log(this.supportedLanguages$)
   }
 
   addSubtitle(language: Language): void {
-    this.detailsViewService.addSubtitle(this.videoId, language, this.userId$.value);
+    this.dialog.open(SaveSubtitleDialogComponent,{width:'500px', data: language.name}).afterClosed().pipe(take(1)).subscribe(dialog => {
+      if (dialog.name)
+      this.detailsViewService.addSubtitle(this.videoId, language, this.user$.value.uid, dialog.name, dialog.format);
+    })
   }
 
-  editSubtitle(ISOcode): void {
-    this.router.navigate(['edit',this.videoId,ISOcode])
+  editSubtitle(ISOcode:string, name:string): void {
+    this.router.navigate(['edit', this.videoId, ISOcode, name])
+  }
+
+  requestCommunityHelp(language:string ,iso: string, filename: string, format: string): void {
+    this.detailsViewService.requestCommunityHelp(this.user$.value, this.videoId,language, iso, filename, format)
   }
 
   navigateToDashboard(): void {

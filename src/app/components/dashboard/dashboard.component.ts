@@ -128,7 +128,7 @@ export class DashboardComponent implements OnInit {
 
   requestCommunityHelp(videoId: string): void {
     this.user$.pipe(take(1)).subscribe((user: GmailUser) => { 
-      this.dashboardService.requestCommunityHelp(videoId,user);
+      // this.dashboardService.requestCommunityHelp(videoId,user);
     })
   }
 

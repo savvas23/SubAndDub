@@ -19,7 +19,7 @@ export class CommunityVideoCardComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    console.log(this.communityRequestDetails)
+    // console.log(this.communityRequestDetails)
     this.publishDate = this.timeSince(new Date(this.videoDetails?.snippet?.publishedAt));
   }
 
