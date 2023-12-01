@@ -10,15 +10,16 @@ import { Router } from '@angular/router';
 import { DialogConfirmationComponent } from 'src/app/shared/components/dialog-confirmation/dialog-confirmation.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
-import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { CommunityHelpService } from 'src/app/services/community-help.service';
+import { CommunityHelpRequest } from 'src/app/models/firestore-schema/help-request.model';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-  providers: [DashboardService],
+  providers: [DashboardService, CommunityHelpService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
@@ -37,6 +38,7 @@ export class DashboardComponent implements OnInit {
   constructor(private auth: AuthService, 
     private dashboardService: DashboardService, 
     private youtubeService: YoutubeService,
+    private communityService: CommunityHelpService,
     private router: Router,
     public dialog: MatDialog,
     private snackbar: MatSnackBar,
@@ -96,6 +98,10 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/details', videoId]);
   }
 
+  navigateToCommunityEdit(communityRequestDetails: CommunityHelpRequest): void {
+    this.router.navigate(['community/edit', communityRequestDetails.videoId, communityRequestDetails.iso, communityRequestDetails.requestId])
+  }
+
   deleteVideoPrompt(videoId: string): void {
     const dialogRef= this.dialog.open(DialogConfirmationComponent, {width:'400px', scrollStrategy: new NoopScrollStrategy()});
     dialogRef.afterClosed().subscribe((deletionFlag) => {
@@ -126,12 +132,6 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.addVideo(videoDetails, this.userId$.value);
   }
 
-  requestCommunityHelp(videoId: string): void {
-    this.user$.pipe(take(1)).subscribe((user: GmailUser) => { 
-      // this.dashboardService.requestCommunityHelp(videoId,user);
-    })
-  }
-
   previewVideo(videoId: string): void {
     this.videoSelectedId = videoId;
   }
@@ -141,9 +141,6 @@ export class DashboardComponent implements OnInit {
     return url;
   }
 
-  search(value: string): void {
-
-  }
   changeToListView(): void {
     this.listView = true;
     this.videoSelectedId = null;

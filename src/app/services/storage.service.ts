@@ -6,6 +6,8 @@ import { Observable, map, switchMap, take } from 'rxjs';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpClient } from '@angular/common/http';
+import { CommunityHelpRequest } from '../models/firestore-schema/help-request.model';
+import { GmailUser } from '../models/firestore-schema/user.model';
 
 @Injectable()
 
@@ -13,20 +15,23 @@ export class StorageService {
 
     private storageRef: AngularFireStorage
 
-    constructor(private http: HttpClient,private authService: AuthService, private firestore: AngularFirestore, private snackbar: MatSnackBar) { }
+    constructor(private http: HttpClient,
+        private authService: AuthService, 
+        private firestore: AngularFirestore, 
+        private snackbar: MatSnackBar) { }
 
     createFirestorageRef(storage: AngularFireStorage, language: string, subtitle: Blob, videoId: string, filePath: string): void {
         //sets up the Firestorage required references and receives required parameters to complete the upload proccess
         this.storageRef = storage;
         let pathRef: AngularFireStorageReference;
         this.authService.user.pipe(take(1)).subscribe(user => {
-            const pathString = `subtitles/${user.uid}/${videoId}/${language}/${filePath}`
+            const pathString = `subtitles/${user.uid}/${videoId}/${language}/${filePath}`;
             pathRef = this.storageRef.ref(pathString);
-            this.uploadToFirestorage(pathRef, subtitle, user.uid, videoId , language,filePath);
+            this.uploadToFirestorage(pathRef, subtitle, user.uid, videoId , language, filePath);
         })
     }
 
-    uploadToFirestorage(pathRef: AngularFireStorageReference, subtitle: Blob, userUid: string, videoId, language: string, filePath:string): void {
+    uploadToFirestorage(pathRef: AngularFireStorageReference, subtitle: Blob, userUid: string, videoId: string, language: string, filePath:string): void {
         pathRef.put(subtitle).then(() => {
             //update firestore record of user with the download url for this uploaded subtitle for future use
             const subRef: AngularFirestoreDocument = this.firestore.doc(`users/${userUid}/videos/${videoId}/subtitleLanguages/${language}/subtitles/${filePath.split('.')[0]}`);
@@ -34,6 +39,36 @@ export class StorageService {
                 subRef.update({
                     storageUrl: url,
                     lastUpdated: Date.now()
+                });
+                this.snackbar.open('Update Complete!','DISMISS', {duration:5000});
+            })
+        }, (reject) => {
+            this.snackbar.open(reject.message);
+        });
+    }
+
+    createFirestorageRefCommunity(storage: AngularFireStorage, subtitle: Blob, requestId: string, requestDetails: CommunityHelpRequest): void {
+        //sets up the Firestorage required references and receives required parameters to complete the upload proccess
+        this.storageRef = storage;
+        let pathRef: AngularFireStorageReference;
+        this.authService.user.pipe(take(1)).subscribe(user => {
+            const pathString = `community-subtitles/${requestId}/${user.uid}/${requestDetails.videoId}`;
+            pathRef = this.storageRef.ref(pathString);
+            this.uploadToFirestorageCommunitySub(pathRef, subtitle, user, requestId, requestDetails);
+        })
+    }
+
+    uploadToFirestorageCommunitySub(pathRef: AngularFireStorageReference, subtitle: Blob, user: GmailUser, requestId: string, requestDetails: CommunityHelpRequest): void {
+        console.log(requestDetails)
+        pathRef.put(subtitle).then(() => {
+            //update firestore record of user with a new notification about the subtitle
+            const subRef: AngularFirestoreDocument = this.firestore.doc(`users/${requestDetails.requestedByID}/notifications/${requestId}/subtitles/${user.uid}`);
+            pathRef.getDownloadURL().pipe(take(1)).subscribe((url: URL) => {
+                subRef.set({
+                    requestId: requestId,
+                    storageUrl: url,
+                    created: Date.now(),
+                    createdBy: user.displayName
                 });
                 this.snackbar.open('Update Complete!','DISMISS', {duration:5000});
             })
@@ -56,6 +91,15 @@ export class StorageService {
     }
 
     fetchSubtitleFile(url: string): Observable<string> {
-       return this.http.get(url, {responseType: 'text'})
+       return this.http.get(url, {responseType: 'text'});
+    }
+
+    getCommunityRequestDetails(requestId: string): Observable<CommunityHelpRequest> {
+        return this.firestore.doc<CommunityHelpRequest>(`helpRequests/${requestId}`).get()
+        .pipe(
+            map(content => { 
+                return content.data()
+            })
+        );
     }
 }

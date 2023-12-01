@@ -36,6 +36,7 @@ export class DialogComponentComponent implements OnInit {
   protected loading: boolean;
   public form: FormGroup;
   public persons: PersonAssign[];
+  @Input() initSubtitles: boolean = true;
   @Input() subtitleName: string;
   @Input() videoId: string;
   @Input() isoCode: string;
@@ -58,22 +59,22 @@ export class DialogComponentComponent implements OnInit {
   constructor(private fb: FormBuilder,
     private fileService: UploadFileHandlerService,
     private storage: StorageService,
-    private userService: AuthService,
     private google: GoogleTranslateService,
     public dialog: MatDialog,
     private ttsService: TextToSpeechService
     ) {}
 
   ngOnInit(): void {
-
-    this.storage.getSubtitleURL(this.videoId, this.isoCode, this.subtitleName).pipe(take(1)).subscribe(url => {
-      if (url) {
-        this.storage.fetchSubtitleFile(url).subscribe((res: string) => {
-          this.subtitles$.next(res)
-          this.handleFileUpload(this.subtitles$);
-        })
-      }
-    });
+    if (this.initSubtitles) {
+      this.storage.getSubtitleURL(this.videoId, this.isoCode, this.subtitleName).pipe(take(1)).subscribe(url => {
+        if (url) {
+          this.storage.fetchSubtitleFile(url).subscribe((res: string) => {
+            this.subtitles$.next(res)
+            this.handleFileUpload(this.subtitles$);
+          })
+        }
+      });
+    }
 
     this.form = this.fb.group({
       '1-dialogBox': this.fb.group({

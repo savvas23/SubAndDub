@@ -51,10 +51,11 @@ import { PersonCreationDialogComponent } from './components/dialog-modal/person-
 import { ColorPickerModule } from 'ngx-color-picker';
 import { GenerateVoiceDialogComponent } from './components/dialog-modal/generate-voice-modal/genereate-voice-modal.component';
 import { GenerateTTSComponent } from './components/generate-tts/generate-tts/generate-tts.component';
-import {MatStepperModule} from '@angular/material/stepper';
+import { MatStepperModule } from '@angular/material/stepper';
 import { FilterPipe } from './shared/pipes/search-filter.pipe';
-import {MatSelectModule} from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { SaveSubtitleDialogComponent } from './components/dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
+import { CommunitySubtitlingContainerComponent } from './community-subtitling-container/community-subtitling-container.component';
 
 @NgModule({
   declarations: [
@@ -83,7 +84,8 @@ import { SaveSubtitleDialogComponent } from './components/dialog-modal/save-subt
     GenerateVoiceDialogComponent,
     GenerateTTSComponent,
     FilterPipe,
-    SaveSubtitleDialogComponent
+    SaveSubtitleDialogComponent,
+    CommunitySubtitlingContainerComponent
   ],
   imports: [
     BrowserModule,

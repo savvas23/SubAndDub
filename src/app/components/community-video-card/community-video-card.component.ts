@@ -10,7 +10,7 @@ export class CommunityVideoCardComponent implements OnInit {
   @Input() videoId: string
   @Input() videoDetails: YoutubeVideoDetails;
   @Input() communityRequestDetails: any;
-  @Output() editVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
+  @Output() editVideoEmitter: EventEmitter<any> = new EventEmitter<any>;
   @Output() deleteVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
   @Output() requestCommunityHelpEmitter: EventEmitter<string> = new EventEmitter<string>;
 
@@ -19,12 +19,12 @@ export class CommunityVideoCardComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    // console.log(this.communityRequestDetails)
+    console.log(this.communityRequestDetails)
     this.publishDate = this.timeSince(new Date(this.videoDetails?.snippet?.publishedAt));
   }
 
-  editVideo(id: string): void {
-    this.editVideoEmitter.emit(id);
+  editVideo(requestDetails: any): void {
+    this.editVideoEmitter.emit(requestDetails);
   }
 
   timeSince(date: Date): string {
