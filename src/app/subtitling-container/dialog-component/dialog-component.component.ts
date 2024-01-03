@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit,Output,ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { BehaviorSubject, Observable, of, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs';
+import { BehaviorSubject, Observable,skip,take, takeUntil, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/general/dialog-box.model';
 import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
 import { ImportModel } from 'src/app/models/general/import-sbv.model';
@@ -9,7 +9,7 @@ import { UploadFileHandlerService } from 'src/app/services/upload-file-handler.s
 import { GoogleTranslateResponse, GoogleTranslations, ResponseObject} from 'src/app/models/google/google-translate-response'
 import { SupportedLanguages } from 'src/app/models/google/google-supported-languages';
 import { TimeFormat } from 'src/app/models/general/time-format.model';
-import { TimeEmitterObject } from './dialog-content/dialog-content.component';
+import { ChatGPTACtion, TimeEmitterObject } from './dialog-content/dialog-content.component';
 import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/shared-functions';
 import { PersonAssign } from 'src/app/models/general/person-assign.model';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,9 +17,10 @@ import { PersonCreationDialogComponent } from 'src/app/components/dialog-modal/p
 import { TextContentToSSML } from 'src/app/models/general/gpt-feed.model';
 import { GenerateVoiceDialogComponent } from 'src/app/components/dialog-modal/generate-voice-modal/genereate-voice-modal.component';
 import { TextToSpeechService } from 'src/app/services/text-to-speech-service.service';
-import { ActivatedRoute } from '@angular/router';
 import { StorageService } from 'src/app/services/storage.service';
-import { AuthService } from 'src/app/services/auth.service';
+import { OpenAIService } from 'src/app/services/open-ai.service';
+import { ConfirmationModalComponent } from 'src/app/components/dialog-modal/confirmation-modal/confirmation-modal.component';
+import { YoutubeService } from 'src/app/services/youtube.service';
 
 @Component({
   selector: 'dialog-component',
@@ -36,6 +37,7 @@ export class DialogComponentComponent implements OnInit {
   protected loading: boolean;
   public form: FormGroup;
   public persons: PersonAssign[];
+  public focusedDialogBox: number;
   @Input() initSubtitles: boolean = true;
   @Input() subtitleName: string;
   @Input() videoId: string;
@@ -43,6 +45,7 @@ export class DialogComponentComponent implements OnInit {
   @Output() subtitleUploadEmitter: EventEmitter<Blob> = new EventEmitter<Blob>();
   @Output() formStatusChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() navigateTTS: EventEmitter<any> = new EventEmitter<any>();
+  @Output() captionsPreviewDispatch: EventEmitter<string> = new EventEmitter<string>();
   @ViewChild('translateMenu') translateMenu;
 
   public dialogBoxes: DialogBox[] = [{
@@ -61,7 +64,9 @@ export class DialogComponentComponent implements OnInit {
     private storage: StorageService,
     private google: GoogleTranslateService,
     public dialog: MatDialog,
-    private ttsService: TextToSpeechService
+    private ttsService: TextToSpeechService,
+    private openai: OpenAIService,
+    private youtube: YoutubeService
     ) {}
 
   ngOnInit(): void {
@@ -79,10 +84,11 @@ export class DialogComponentComponent implements OnInit {
     this.form = this.fb.group({
       '1-dialogBox': this.fb.group({
         subtitles: this.fb.control(''),
-        start_time: this.fb.control('00:00:00.000'),
-        end_time: this.fb.control('00:00:02.000'),
+        start_time: this.fb.control('00:00.00'),
+        end_time: this.fb.control('00:02.00'),
         })
     });
+
     // Subscribe to form status changes
     this.form.statusChanges.pipe().subscribe(() => {
       const isDirty = this.form.dirty;
@@ -91,7 +97,28 @@ export class DialogComponentComponent implements OnInit {
       }
     });
 
+    this.youtube.getCurrentTime().pipe(skip(1)).subscribe(currentSecond => {
+      const currentDialogBox = this.dialogBoxes.find(dialogBox => {
+        const startTimeInSeconds = this.getSecondsFromTime(this.form.get(dialogBox.id + '-dialogBox').get('start_time').value);
+        const endTimeInSeconds = this.getSecondsFromTime(this.form.get(dialogBox.id + '-dialogBox').get('end_time').value);
+        return currentSecond >= startTimeInSeconds && currentSecond <= endTimeInSeconds;
+      });
+
+      if (currentDialogBox) {
+        this.setFocusToDialogBoxItem(currentDialogBox.id);
+        this.youtube.updateCurrentCaption(this.form.get(currentDialogBox.id + '-dialogBox').get('subtitles').value);
+      } else {
+        this.focusedDialogBox = undefined;
+        this.youtube.updateCurrentCaption(null);
+      }
+    })
+    
     this.getSupportedLanguages();
+  }
+
+  setFocusToDialogBoxItem(dialogBoxItemId: number) {
+    // Replace this with your actual implementation to set focus
+    this.focusedDialogBox = dialogBoxItemId;
   }
 
   getDialogControl(dialogBoxId: number): FormGroup {
@@ -126,7 +153,7 @@ export class DialogComponentComponent implements OnInit {
       const targetControlString = prevControl[prevControlIndex].toString(); // get the string value of the name of last element of the form controls
       return this.form?.get(targetControlString)?.get('end_time')?.value as string;
     } else {
-      return '00:00:00.000';
+      return '00:00.00';
     }
   }
 
@@ -137,17 +164,17 @@ export class DialogComponentComponent implements OnInit {
       const targetControlString = prevControl[prevControlIndex].toString();
       const prevEndTime = this.form?.get(targetControlString)?.get('end_time')?.value as string; // // get the string value of the name of last element of the form controls
       const prevEndTimeSplit = prevEndTime.split(':');
-      let lastElement = parseInt(prevEndTimeSplit[2]); // Convert the last element to a number
+      let lastElement = parseInt(prevEndTimeSplit[1]); // Convert the last element to a number
       lastElement += 2; // Increase the last element by 2
-      prevEndTimeSplit[2] = lastElement.toString(); //
+      prevEndTimeSplit[1] = lastElement.toString(); //
   
-      if (prevEndTimeSplit[2].length === 1) { //check if its 1 digit number and '0' infront to conform with time format
-        prevEndTimeSplit[2] = '0' + prevEndTimeSplit[2];
+      if (prevEndTimeSplit[1].length === 1) { //check if its 1 digit number and '0' infront to conform with time format
+        prevEndTimeSplit[1] = '0' + prevEndTimeSplit[1];
       }
       return prevEndTimeSplit.join(':') + '.000'; //change at a later stage to calculate actual miliseconds from previous value
 
     } else {
-        return '00:00:02.000';
+        return '00:02.00';
     }
   }
 
@@ -210,6 +237,12 @@ export class DialogComponentComponent implements OnInit {
     }
   }
 
+  // Helper function to convert time format (mm:ss.SSS) to seconds
+getSecondsFromTime(time: string): number {
+  const [minutes, seconds] = time.split(':').map(parseFloat);
+  return minutes * 60 + seconds;
+}
+
   translateAllSubtitles(targetLanguage: string): void {
     let translationObject: GoogleTranslateRequestObject = {
       q: [],
@@ -258,6 +291,19 @@ export class DialogComponentComponent implements OnInit {
 
   }
 
+  chatGPTEventDispatcher(GPTaction: ChatGPTACtion) {
+    this.openai.getDataFromOpenAI(GPTaction).subscribe(res => {
+      if (res) {
+        this.dialog.open(ConfirmationModalComponent, {'width': '700px', data: {
+          current_text: this.form.get(GPTaction.dialogId + '-dialogBox').get('subtitles').value,
+          new_text: res
+        }}).afterClosed().pipe(take(1)).subscribe(confirmation => {
+          if (confirmation) this.form.get(GPTaction.dialogId + '-dialogBox').get('subtitles').setValue(res);
+        })
+      }
+    })
+  }
+
   getSupportedLanguages(): void {
     this.google.getSupportedLanguages()
     .pipe(tap(() => {
@@ -278,7 +324,6 @@ export class DialogComponentComponent implements OnInit {
 
   uploadSubtitle(): void {
     this.subtitleUploadEmitter.emit(this.createSubtitleBlob());
- 
   }
 
   createSubtitleBlob(): Blob {

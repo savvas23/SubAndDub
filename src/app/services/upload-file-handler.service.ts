@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { ImportModel } from 'src/app/models/general/import-sbv.model';
 
 @Injectable()
@@ -8,6 +7,7 @@ export class UploadFileHandlerService {
   constructor() { }
 
   cleanMultilineString(input: string): ImportModel[] {
+    console.log(input)
     const lines = input.trim().replace(/(\r|\r)/gm, '').split('\n');
 
     const subtitleObjects = [];
@@ -33,11 +33,7 @@ export class UploadFileHandlerService {
 
   formatTimestamp(timestamp: string): string {
     const parts = timestamp.split(':');
-    for (let i = 0; i < parts.length; i++) {
-        if (parts[i]?.length === 1) {
-            parts[i] = '0' + parts[i];
-        }
-    }
+    parts.shift()
     return parts.join(':');
   }
 }

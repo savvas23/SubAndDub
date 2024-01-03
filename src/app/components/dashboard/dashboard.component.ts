@@ -14,6 +14,7 @@ import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, of, s
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommunityHelpService } from 'src/app/services/community-help.service';
 import { CommunityHelpRequest } from 'src/app/models/firestore-schema/help-request.model';
+import { OpenAIService } from 'src/app/services/open-ai.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -38,7 +39,6 @@ export class DashboardComponent implements OnInit {
   constructor(private auth: AuthService, 
     private dashboardService: DashboardService, 
     private youtubeService: YoutubeService,
-    private communityService: CommunityHelpService,
     private router: Router,
     public dialog: MatDialog,
     private snackbar: MatSnackBar,

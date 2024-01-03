@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
 import { PersonAssign } from 'src/app/models/general/person-assign.model';
-import { Language, Languages, SupportedLanguages } from 'src/app/models/google/google-supported-languages';
+import { Language} from 'src/app/models/google/google-supported-languages';
+import { YoutubeService } from 'src/app/services/youtube.service';
 import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/shared-functions';
 
 @Component({
@@ -15,20 +15,33 @@ export class DialogContentComponent {
   @Input() index: number;
   @Input() dialogId: number;
   @Input() persons: PersonAssign[];
-  @Input() supportedLanguages: Language[]
+  @Input() supportedLanguages: Language[];
+  @Input() hasFocus: boolean;
   @Output() deleteDialogBoxEvent: EventEmitter<number> = new EventEmitter();
   @Output() dialogEmitter: EventEmitter<TimeEmitterObject> = new EventEmitter();
   @Output() translateSubtitle: EventEmitter<{lang: string, id: number}> = new EventEmitter();
+  @Output() chatGPTEventEmmiter: EventEmitter<ChatGPTACtion> = new EventEmitter();
+
 
   @ViewChild('translateMenu') translateMenu;
+  @ViewChild('assingPersonMenu') assignPersonMenu;
+  @ViewChild('openAIMenu') openAIMenu;
 
-  @ViewChild('assingPersoneMenu') assignPersonMenu;
   assignedPerson: PersonAssign;
   wordCount: number = 0;
   characterCount: number = 0;
   timingEstimation: number = 0;
   estimationTooltip: string;
   estimationIcon: string;
+  readonly openAIMenuMap = new Map([
+    ['translate','Translate this sentence'],
+    ['sad','Give this sentence a sadder tone'],
+    ['joyful','Give this sentence a joyful tone'],
+    ['shorter','Make this sentence shorter'],
+    ['longer','Make this sentence longer']
+  ])
+
+  constructor(private youtube: YoutubeService) {}
 
   getDialogControl(control: string): FormControl {
     return this.dialogGroup.get(control) as FormControl
@@ -52,6 +65,20 @@ export class DialogContentComponent {
 
   translateSub(lang: string): void {
     this.translateSubtitle.emit({lang: lang, id: this.dialogId });
+  }
+
+  chatGPTevent(action: string): void {
+    const gptAction: ChatGPTACtion = {
+      dialogId: this.dialogId,
+      text: this.dialogGroup.get('subtitles').value,
+      action: action
+    }
+    this.chatGPTEventEmmiter.emit(gptAction);
+  }
+
+  seekToPlayer(value: string): void {
+    this.youtube.seekToPoint(calculateSeconds(parseTimestamp(value)));
+    
   }
 
   wordCounter(): void {
@@ -107,4 +134,10 @@ export class DialogContentComponent {
 export interface TimeEmitterObject {
   id: number;
   control: string;
+}
+
+export interface ChatGPTACtion {
+  dialogId: number;
+  text: string;
+  action: string
 }

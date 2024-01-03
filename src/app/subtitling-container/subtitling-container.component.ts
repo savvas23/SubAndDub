@@ -31,6 +31,7 @@ export class SubtitlingContainerComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router, 
     private storageService: StorageService,
+    protected youtube: YoutubeService,
     public dialog: MatDialog) { }
 
   ngOnInit(): void {

@@ -1,8 +1,18 @@
-<mat-card>
+<mat-card [ngClass]="{'focused-box': hasFocus}">
   <span class="header-assigment-ribbon" *ngIf="assignedPerson" [style.background]="assignedPerson.color"></span>
     <mat-card-header>
       <mat-card-title>Subtitle {{index + 1}}</mat-card-title>
       <mat-icon class="estimation-icon" [matTooltip]="estimationTooltip">{{estimationIcon}}</mat-icon>
+      <button mat-icon-button matTooltip="ChatGPT Helper"
+        [matMenuTriggerFor]="translateMenu">
+        <img width="48" height="48" src="https://img.icons8.com/material-outlined/48/chatgpt.png" alt="chatgpt"/>
+      </button>
+        <mat-menu #translateMenu="matMenu">
+        <p mat-menu-item *ngFor="let item of openAIMenuMap | keyvalue"
+          (click)="chatGPTevent(item.key)">
+          {{item.value}}
+        </p>
+      </mat-menu>
       <button mat-icon-button matTooltip="Translate this subtitle"
         [matMenuTriggerFor]="translateMenu">
         <mat-icon>g_translate</mat-icon>
@@ -38,20 +48,21 @@
     </mat-card-header>
     <mat-card-content>
         <mat-form-field subscriptSizing="dynamic">
-          <textarea matInput (input)="wordCounter(); characterCounter(); subtitlingTimingEstimation();" [formControl]="getDialogControl('subtitles')" type="text"></textarea>
+          <textarea matInput (input)="wordCounter(); characterCounter(); subtitlingTimingEstimation();"
+            (click)="seekToPlayer(dialogGroup.get('start_time').value)"  [formControl]="getDialogControl('subtitles')" type="text"></textarea>
         </mat-form-field>
         <div fxLayout="column" fxLayoutGap="10px" fxFlex="30">
-          <mat-form-field subscriptSizing="dynamic">
+          <mat-form-field subscriptSizing="dynamic" (click)="seekToPlayer(dialogGroup.get('start_time').value)">
             <mat-label>From:</mat-label>
-            <input matInput (input)="emitDialogId('start_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('start_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
+            <input matInput (input)="emitDialogId('start_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('start_time')" matTooltip="mm:ss:ms" type="text">
           </mat-form-field>
-          <mat-form-field subscriptSizing="dynamic">
+          <mat-form-field subscriptSizing="dynamic" (click)="seekToPlayer(dialogGroup.get('end_time').value)">
             <mat-label>To:</mat-label>
-            <input matInput (input)="emitDialogId('end_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('end_time')" matTooltip="hh:mm:ss:ms" type="time" step="0.1">
+            <input matInput (input)="emitDialogId('end_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('end_time')" matTooltip="mm:ss:ms" type="text">
           </mat-form-field>
         </div>
     </mat-card-content>
     <mat-card-subtitle>
-      <span>{{wordCount}} words, {{characterCount}} characters, {{timingEstimation}}ms estimated reading time.</span>
+      <span>{{wordCount}} words, {{characterCount}} characters, {{timingEstimation}} ms estimated reading time.</span>
     </mat-card-subtitle>
 </mat-card>

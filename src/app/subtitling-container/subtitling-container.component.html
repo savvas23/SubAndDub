@@ -5,14 +5,14 @@
     </button>
     </div>
     <div class="wrapper">
-        <video-player [videoId]="videoId"></video-player>
+        <video-player [videoId]="videoId" [captionsPreview]="(youtube.getCurrentCaption() | async)"></video-player>
         <dialog-component
             [isoCode]="currentLanguage"
             [videoId]="videoId"
             [subtitleName]="fileName"
             (subtitleUploadEmitter)="uploadToFirestorage($event)"
             (navigateTTS)="navigateTTS()"
-            (formStatusChange)="setFormDirtyStatus($event)">
+            (formStatusChange)="setFormDirtyStatus($event)"> 
         </dialog-component>
     </div>
 <!-- <sub-timeline [videoDurationISO]="videoDuration"></sub-timeline> -->

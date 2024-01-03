@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -7,5 +8,13 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./sign-in.component.css']
 })
 export class SignInComponent {
-  constructor(public auth: AuthService) { }
+  constructor(public auth: AuthService,private router: Router) { }
+
+  getStarted(): void {
+    if (this.auth.isLoggedIn) {
+      this.router.navigate(['dashboard']);
+    } else {
+      this.auth.googleSignin();
+    }
+  }
 }

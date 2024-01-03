@@ -38,8 +38,10 @@
         [index]="dialogIndex"
         [dialogId]="dialogBox.id"
         [persons]="persons"
+        [hasFocus]="focusedDialogBox === dialogBox.id"
         [supportedLanguages]="(supportedLanguages$ | async)?.data?.languages"
         (translateSubtitle)="translateSingleSubtitle($event)"
+        (chatGPTEventEmmiter)="chatGPTEventDispatcher($event)"
         (deleteDialogBoxEvent)="deleteDialogBox($event)"
         (dialogEmitter)="timeRangeValidation($event)">
         </dialog-content>

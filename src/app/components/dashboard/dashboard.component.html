@@ -1,7 +1,7 @@
 <div *ngIf="(user$ | async)" class="dashboard-wrapper">
     <div class="dashboard-header">
-        <h1>My Videos ({{(userVideos$ | async)?.length}})</h1>
-        <button mat-mini-fab color="primary"
+        <span class="my-videos">My Videos ({{(userVideos$ | async)?.length}})</span>
+        <button mat-icon-button
            (click)="openDialog()" matTooltip="Add New video"><mat-icon>add</mat-icon>
         </button>
         <mat-form-field>

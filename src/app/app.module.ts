@@ -56,6 +56,7 @@ import { FilterPipe } from './shared/pipes/search-filter.pipe';
 import { MatSelectModule } from '@angular/material/select';
 import { SaveSubtitleDialogComponent } from './components/dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
 import { CommunitySubtitlingContainerComponent } from './community-subtitling-container/community-subtitling-container.component';
+import { ConfirmationModalComponent } from './components/dialog-modal/confirmation-modal/confirmation-modal.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,8 @@ import { CommunitySubtitlingContainerComponent } from './community-subtitling-co
     GenerateTTSComponent,
     FilterPipe,
     SaveSubtitleDialogComponent,
-    CommunitySubtitlingContainerComponent
+    CommunitySubtitlingContainerComponent,
+    ConfirmationModalComponent
   ],
   imports: [
     BrowserModule,
