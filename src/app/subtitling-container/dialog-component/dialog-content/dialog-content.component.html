@@ -54,11 +54,12 @@
         <div fxLayout="column" fxLayoutGap="10px" fxFlex="30">
           <mat-form-field subscriptSizing="dynamic" (click)="seekToPlayer(dialogGroup.get('start_time').value)">
             <mat-label>From:</mat-label>
-            <input matInput (input)="emitDialogId('start_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('start_time')" matTooltip="mm:ss:ms" type="text">
+            <input matInput (input)="emitDialogId('start_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('start_time')" [maxlength]="9" matTooltip="mm:ss:ms" type="text">
           </mat-form-field>
           <mat-form-field subscriptSizing="dynamic" (click)="seekToPlayer(dialogGroup.get('end_time').value)">
             <mat-label>To:</mat-label>
-            <input matInput (input)="emitDialogId('end_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('end_time')" matTooltip="mm:ss:ms" type="text">
+            <input matInput (input)="emitDialogId('end_time'); subtitlingTimingEstimation();" [formControl]="getDialogControl('end_time')" [maxlength]="9" matTooltip="mm:ss:ms" type="text">
+            <mat-error *ngIf="getDialogControl('end_time').hasError('invalidTimeFormat')">Invalid time format.</mat-error>
           </mat-form-field>
         </div>
     </mat-card-content>

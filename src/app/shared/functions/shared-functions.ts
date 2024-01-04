@@ -1,8 +1,8 @@
 import { TimeFormat } from "src/app/models/general/time-format.model";
 
 export function parseTimestamp(value: string): TimeFormat {
-    const parts = value.split(':');
-    const [seconds, milliseconds] = parts[1].split('.');
+    const parts = value?.split(':');
+    const [seconds, milliseconds] = parts[1]?.split('.');
     
     const timeformatObject: TimeFormat = {
       hour: Math.floor(parseInt(parts[0], 10) / 60),

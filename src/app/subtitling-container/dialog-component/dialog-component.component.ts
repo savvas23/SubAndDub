@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit,Output,ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable,skip,take, takeUntil, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/general/dialog-box.model';
 import { GoogleTranslateRequestObject } from 'src/app/models/google/google-translate-request';
@@ -21,6 +21,7 @@ import { StorageService } from 'src/app/services/storage.service';
 import { OpenAIService } from 'src/app/services/open-ai.service';
 import { ConfirmationModalComponent } from 'src/app/components/dialog-modal/confirmation-modal/confirmation-modal.component';
 import { YoutubeService } from 'src/app/services/youtube.service';
+import { BatchDialogModalComponent } from 'src/app/components/dialog-modal/batch-dialog-modal/batch-dialog-modal.component';
 
 @Component({
   selector: 'dialog-component',
@@ -42,6 +43,7 @@ export class DialogComponentComponent implements OnInit {
   @Input() subtitleName: string;
   @Input() videoId: string;
   @Input() isoCode: string;
+  @Input() videoDuration: any;
   @Output() subtitleUploadEmitter: EventEmitter<Blob> = new EventEmitter<Blob>();
   @Output() formStatusChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() navigateTTS: EventEmitter<any> = new EventEmitter<any>();
@@ -141,13 +143,69 @@ export class DialogComponentComponent implements OnInit {
     });
   }
 
+  batchAddDialogBox(): void {
+    this.dialog.open(BatchDialogModalComponent).afterClosed().pipe(take(1)).subscribe((interval: number) => {
+      if (interval > 0) {
+        const seconds = this.parseISOtoSeconds(this.videoDuration);
+        const controlNames = Object.keys(this.form.controls);
+        let lastControlName = controlNames[controlNames.length - 1];
+
+        for (let i = parseInt(lastControlName.split('-')[0]); i < seconds / interval; i ++) {
+          this.addDialogBox({
+            start_time: this.form.get(i + '-dialogBox').get('end_time').value,
+            end_time: this.intervalAddition(this.form.get(i + '-dialogBox').get('end_time').value, interval),
+            subtitleText: ''
+          });
+        };
+
+      }
+    });
+  }
+
+  intervalAddition(inputValue: string, intervalInSeconds: number): string {
+    // Parse the input time string into minutes, seconds, and milliseconds
+    const [minutes, secondsWithMillis] = inputValue.split(':');
+    const [seconds, milliseconds] = secondsWithMillis.split('.');
+
+    // Convert everything to milliseconds
+    const totalMilliseconds = (parseInt(minutes) * 60 + parseInt(seconds)) * 1000 + parseInt(milliseconds);
+
+    // Add the interval in milliseconds
+    const newTotalMilliseconds = totalMilliseconds + intervalInSeconds * 1000;
+
+    // Calculate the new minutes, seconds, and milliseconds
+    const newMinutes = Math.floor(newTotalMilliseconds / (60 * 1000));
+    const newSeconds = Math.floor((newTotalMilliseconds % (60 * 1000)) / 1000);
+    const newMilliseconds = newTotalMilliseconds % 1000;
+
+    // Format the result as "00:00.000"
+    const formattedResult = `${String(newMinutes).padStart(2, '0')}:${String(newSeconds).padStart(2, '0')}.${String(newMilliseconds).padStart(3, '0')}`;
+
+    return formattedResult;
+  }
+
+  parseISOtoSeconds(ISOdate: any): number {
+    let match = ISOdate.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    match = match.slice(1).map(function(x) {
+      if (x != null) {
+          return x.replace(/\D/, '');
+      }
+    });
+    
+    const hours = (parseInt(match[0]) || 0);
+    const minutes = (parseInt(match[1]) || 0);
+    const seconds = (parseInt(match[2]) || 0);
+    
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+
   deleteDialogBox(deleteId: number): void {
     this.form.removeControl(deleteId + '-dialogBox');
     this.dialogBoxes = this.dialogBoxes.filter(dialogBox => dialogBox.id !== deleteId);
   }
 
   setStartTimeControlValue(): string {
-    if (this.dialogBoxes.length) {
+  if (this.dialogBoxes.length) {
       const prevControlIndex = Object.keys(this.form.controls).length - 1;
       const prevControl = Object.keys(this.form.controls);
       const targetControlString = prevControl[prevControlIndex].toString(); // get the string value of the name of last element of the form controls
@@ -216,7 +274,7 @@ export class DialogComponentComponent implements OnInit {
   }
 
   endTimeValidation(nextGroup: FormGroup, currentGroup: FormGroup, startTimestampFormatted: TimeFormat, endTimestampFormatted: TimeFormat): void {
-
+    console.log(calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted))
     if (calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted)) {
       currentGroup.get('end_time').setErrors({higherStartTime:true});
     } else {
@@ -226,10 +284,8 @@ export class DialogComponentComponent implements OnInit {
     if (nextGroup) {
       const nextStartTimestampFormatted = parseTimestamp(nextGroup?.get('start_time')?.value);
       if (calculateSeconds(nextStartTimestampFormatted) < calculateSeconds(endTimestampFormatted)) {
-        currentGroup.get('end_time').setErrors({higherPrevEndTime:true});
         nextGroup.get('start_time').setErrors({higherPrevEndTime:true});
       } else {
-        currentGroup.get('end_time').setErrors(null);
         nextGroup.get('start_time').setErrors(null);
       }
       currentGroup.get('end_time').markAsTouched();
@@ -357,7 +413,7 @@ getSecondsFromTime(time: string): number {
     });
 
     this.dialogBoxes = [];
-    this.dialogBoxId = 1;
+    this.dialogBoxId = 0;
 
     for (let individualSub of cleanArray) {
       this.addDialogBox(individualSub);
@@ -391,4 +447,13 @@ getSecondsFromTime(time: string): number {
 export interface UploadSubtitle {
   content: Blob;
   file_name: string
+}
+
+export function timePatternValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const pattern = /^\d{2}:\d{2}\.\d{3}$/;
+    const valid = pattern.test(control.value);
+
+    return valid ? null : { invalidTimeFormat: true };
+  };
 }

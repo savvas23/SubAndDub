@@ -10,6 +10,7 @@
             [isoCode]="currentLanguage"
             [videoId]="videoId"
             [subtitleName]="fileName"
+            [videoDuration]="videoDuration | async"
             (subtitleUploadEmitter)="uploadToFirestorage($event)"
             (navigateTTS)="navigateTTS()"
             (formStatusChange)="setFormDirtyStatus($event)"> 

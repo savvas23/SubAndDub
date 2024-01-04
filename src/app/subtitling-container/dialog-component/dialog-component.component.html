@@ -5,6 +5,10 @@
             matTooltip="Add Dialog Box"><mat-icon>add</mat-icon>
         </button>
         <button mat-icon-button color="primary"
+        (click)="batchAddDialogBox()" 
+        matTooltip="Batch Add Dialog Boxes"><mat-icon>library_add</mat-icon>
+        </button>
+        <button mat-icon-button color="primary"
             matTooltip="Translate all subtitles"
             [matMenuTriggerFor]="translateMenu">
             <mat-icon>g_translate</mat-icon>

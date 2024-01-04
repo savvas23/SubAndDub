@@ -73,7 +73,7 @@ export class DialogContentComponent {
       text: this.dialogGroup.get('subtitles').value,
       action: action
     }
-    this.chatGPTEventEmmiter.emit(gptAction);
+    if (gptAction.text) this.chatGPTEventEmmiter.emit(gptAction);
   }
 
   seekToPlayer(value: string): void {

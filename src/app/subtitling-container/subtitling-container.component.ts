@@ -22,7 +22,7 @@ export class SubtitlingContainerComponent implements OnInit {
   currentLanguage: string;
   fileName: string;
   videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
-  videoDuration: string;
+  videoDuration: BehaviorSubject<string> = new BehaviorSubject<string>('');
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   isFormDirty: boolean = false;
   private storage: AngularFireStorage = inject(AngularFireStorage);
@@ -38,6 +38,16 @@ export class SubtitlingContainerComponent implements OnInit {
     this.videoId = this.route.snapshot.paramMap.get('id');
     this.currentLanguage = this.route.snapshot.paramMap.get('languageCode');
     this.fileName = this.route.snapshot.paramMap.get('name');
+
+    this.youtube.getVideoDetails(this.videoId).pipe(take(1),tap(() => {
+      this.loading$.next(true);
+    })).subscribe((res) => {
+      if (res) { 
+        this.videoDetails$.next(res);
+        this.videoDuration.next(this.videoDetails$.value[0].contentDetails.duration);
+        this.loading$.next(false);
+      }
+    })
   }
 
   setFormDirtyStatus(isDirty: boolean): void {

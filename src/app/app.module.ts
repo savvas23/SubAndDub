@@ -57,6 +57,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { SaveSubtitleDialogComponent } from './components/dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
 import { CommunitySubtitlingContainerComponent } from './community-subtitling-container/community-subtitling-container.component';
 import { ConfirmationModalComponent } from './components/dialog-modal/confirmation-modal/confirmation-modal.component';
+import { BatchDialogModalComponent } from './components/dialog-modal/batch-dialog-modal/batch-dialog-modal.component';
 
 @NgModule({
   declarations: [
@@ -87,7 +88,8 @@ import { ConfirmationModalComponent } from './components/dialog-modal/confirmati
     FilterPipe,
     SaveSubtitleDialogComponent,
     CommunitySubtitlingContainerComponent,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    BatchDialogModalComponent
   ],
   imports: [
     BrowserModule,
