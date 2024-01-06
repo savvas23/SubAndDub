@@ -4,16 +4,28 @@
             <button class="back-button" (click)="navigateToDashboard()" mat-icon-button color="primary"><mat-icon>arrow_back</mat-icon></button>
             Back to Dashboard
         </div>
-        <div *ngIf="(videoDetails$ | async) as videoDetails" class="video-details">
-            <a [href]="'//youtube.com/watch?v=' + videoDetails[0]?.id" target="_blank">
-                <img [src]="videoDetails[0]?.snippet.thumbnails?.medium?.url">
-            </a>
-            <div class="title">
-             <span>
-                {{(videoDetails[0]?.snippet?.title?.length > 50) ? (videoDetails[0]?.snippet?.title | slice:0:50) + '...' : (videoDetails[0]?.snippet?.title)}}
-             </span>
+        <div class="video-wrapper">
+            <div *ngIf="(videoDetails$ | async) as videoDetails" class="video-details">
+                <a [href]="'//youtube.com/watch?v=' + videoDetails[0]?.id" target="_blank">
+                    <img [src]="videoDetails[0]?.snippet.thumbnails?.medium?.url">
+                </a>
+                <div class="title">
+                 <span>
+                    {{(videoDetails[0]?.snippet?.title?.length > 50) ? (videoDetails[0]?.snippet?.title | slice:0:50) + '...' : (videoDetails[0]?.snippet?.title)}}
+                 </span>
+                </div>
+                <div class="views">
+                    <span id="views">{{videoDetails[0]?.statistics?.viewCount | number }} views</span> · 
+                    <span>{{publishDate | async}} ago</span>
+                </div>
+                <!-- <video-card [videoDetails]="videoDetails[0]" [showActions]="false"></video-card> -->
             </div>
-            <!-- <video-card [videoDetails]="videoDetails[0]" [showActions]="false"></video-card> -->
+            <div class="captions-details">
+                <span>Existing Captions in YouTube:</span>
+                <span class="captions" *ngFor="let caption of videoCaptionDetails$ | async">
+                    {{regionNamesInEnglish.of(caption.snippet.language)}} - {{caption.snippet.trackKind | uppercase}}
+                </span>
+            </div>
         </div>
     </div>
 

@@ -11,6 +11,7 @@ import { GoogleTranslateService } from 'src/app/services/googletranslate.service
 import { YoutubeService } from 'src/app/services/youtube.service';
 import { SaveSubtitleDialogComponent } from '../dialog-modal/save-subtitle-dialog/save-subtitle-dialog.component';
 import { GmailUser } from 'src/app/models/firestore-schema/user.model';
+import { timeSince } from '../video-card/video-card.component';
 
 @Component({
   selector: 'details-view',
@@ -21,10 +22,14 @@ import { GmailUser } from 'src/app/models/firestore-schema/user.model';
 export class DetailsViewComponent implements OnInit {
   videoId: string;
   videoDetails$: BehaviorSubject<YoutubeVideoDetails[]> = new BehaviorSubject<YoutubeVideoDetails[]>(null);
+  videoCaptionDetails$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>(null);
   supportedLanguages$: BehaviorSubject<SupportedLanguages> = new BehaviorSubject<SupportedLanguages>(null);
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   user$: BehaviorSubject<GmailUser> = new BehaviorSubject<GmailUser>(null);
   dataSource: any[];
+  publishDate: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  readonly regionNamesInEnglish = new Intl.DisplayNames(['en'], { type: 'language' });
+
 
   @ViewChild('translateMenu') translateMenu;
 
@@ -51,9 +56,13 @@ export class DetailsViewComponent implements OnInit {
         }
       })).subscribe(languages => {
       this.dataSource = languages;
-      console.log(this.dataSource)
     });
+    this.getVideoDetails();
+    this.getCaptionDetails();
+    this.getSupportedLanguages();
+  }
 
+  getVideoDetails(): void {
     this.youtubeService.getVideoDetails(this.videoId).pipe(
       tap(() => {
         this.loading$.next(true);
@@ -61,10 +70,21 @@ export class DetailsViewComponent implements OnInit {
       if (res) { 
         this.videoDetails$.next(res);
         this.loading$.next(false);
+        this.publishDate.next(timeSince(new Date(this.videoDetails$.value[0]?.snippet?.publishedAt)));
       }
     });
+  }
 
-    this.getSupportedLanguages();
+  getCaptionDetails(): void {
+    this.youtubeService.getCaptionDetails(this.videoId).pipe(
+      tap(() => {
+        this.loading$.next(true);
+      })).subscribe((res) => {
+      if (res) { 
+        this.videoCaptionDetails$.next(res);
+        this.loading$.next(false);
+      }
+    });
   }
 
   getSupportedLanguages(): void {
@@ -80,8 +100,9 @@ export class DetailsViewComponent implements OnInit {
 
   addSubtitle(language: Language): void {
     this.dialog.open(SaveSubtitleDialogComponent,{width:'500px', data: language.name}).afterClosed().pipe(take(1)).subscribe(dialog => {
-      if (dialog.name)
-      this.detailsViewService.addSubtitle(this.videoId, language, this.user$.value.uid, dialog.name, dialog.format);
+      if (dialog?.name) {
+        this.detailsViewService.addSubtitle(this.videoId, language, this.user$.value.uid, dialog.name, dialog.format);
+      }
     })
   }
 

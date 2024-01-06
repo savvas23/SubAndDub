@@ -1,6 +1,6 @@
 .wrapper {
     display:flex;
-    gap:100px;
+    gap:50px;
 }
 
 .main-content {
@@ -13,6 +13,7 @@
 .left-container {
     max-width: 35vh;
     display: flex;
+    flex-grow:1;
     flex-direction: column;
     padding-left:20px;
 }
@@ -54,4 +55,25 @@
 
 ::ng-deep .mat-mdc-menu-content {
     max-height: 700px;
+}
+
+.captions-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.views {
+    flex: 6;
+    font-size: 16px;
+    color: grey;
+}
+
+.video-wrapper{
+    box-shadow: rgb(113, 113, 114) 0px 10px 35px -10px;
+    border-radius:5px;
+}
+
+.title,.views,.captions-details {
+    padding-left:10px;
+    padding-bottom:5px;
 }

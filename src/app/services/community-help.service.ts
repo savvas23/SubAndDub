@@ -8,7 +8,6 @@ export class CommunityHelpService  {
 
     setCommunityRequestDetails(details: CommunityHelpRequest): void {
         this.communityRequestDetails = details;
-        console.log(this.communityRequestDetails)
     }
     
 }

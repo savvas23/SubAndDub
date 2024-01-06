@@ -32,6 +32,18 @@ export class YoutubeService implements OnDestroy {
     ));
   }
 
+  getCaptionDetails(videoIdsPayload: string): Observable<YoutubeVideoDetails[]> {
+    const videoIds = videoIdsPayload;
+    const url = `https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoIds}&key=${GOOGLE_API_KEY}`
+    return this.http.get<YoutubeResponse>(url).pipe(
+      map((res) => {
+        if (res)
+          return res.items;
+        return;
+      }
+    ));
+  }
+
   getCurrentTime(): Observable<number> {
     return this.currentTimeSubject.asObservable();
   }

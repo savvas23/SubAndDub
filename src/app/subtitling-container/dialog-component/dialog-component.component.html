@@ -22,7 +22,7 @@
                     </p>
                 </ng-template>
             </mat-menu>
-        <import-button (fileContentEmit)="handleFileUpload($event)" [acceptedFiles]="'.sbv'">
+        <import-button (fileContentEmit)="handleFileUpload($event)" [acceptedFiles]="'.sbv, .srt, .txt'">
         </import-button>
         <button (click)="downloadSubtitle()" mat-icon-button color="primary"
          matTooltip="Download Subtitles">
@@ -36,7 +36,7 @@
         </button>
         <button (click)="generateSpeechInit()" mat-icon-button color="primary" matTooltip="Generete Voices/Speech for your subtitles"><mat-icon>record_voice_over</mat-icon></button>
     </div>
-    <div class="main-content_wrapper">
+    <div class="main-content_wrapper" #scrollContainer>
         <dialog-content *ngFor="let dialogBox of dialogBoxes; let dialogIndex = index"
         [dialogGroup]="getDialogControl(dialogBox.id)"
         [index]="dialogIndex"

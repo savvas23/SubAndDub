@@ -1,4 +1,4 @@
 <button mat-icon-button color="primary"
 (click)="uploadFile.click()" 
-matTooltip="Import subtitles / sbv format"><mat-icon>arrow_upward</mat-icon></button>
+matTooltip="Import subtitles"><mat-icon>arrow_upward</mat-icon></button>
 <input #uploadFile (change)="selectFile($event)" hidden="true" id="uploadFile" type="file" [accept]="acceptedFiles"/>

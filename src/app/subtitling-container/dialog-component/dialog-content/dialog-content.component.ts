@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PersonAssign } from 'src/app/models/general/person-assign.model';
 import { Language} from 'src/app/models/google/google-supported-languages';
@@ -10,7 +10,7 @@ import { calculateSeconds, parseTimestamp } from 'src/app/shared/functions/share
   templateUrl: './dialog-content.component.html',
   styleUrls: ['./dialog-content.component.css']
 })
-export class DialogContentComponent {
+export class DialogContentComponent implements OnChanges {
   @Input() dialogGroup: FormGroup;
   @Input() index: number;
   @Input() dialogId: number;
@@ -22,7 +22,7 @@ export class DialogContentComponent {
   @Output() translateSubtitle: EventEmitter<{lang: string, id: number}> = new EventEmitter();
   @Output() chatGPTEventEmmiter: EventEmitter<ChatGPTACtion> = new EventEmitter();
 
-
+  @ViewChild("cardElement") cardElement: ElementRef;
   @ViewChild('translateMenu') translateMenu;
   @ViewChild('assingPersonMenu') assignPersonMenu;
   @ViewChild('openAIMenu') openAIMenu;
@@ -42,6 +42,12 @@ export class DialogContentComponent {
   ])
 
   constructor(private youtube: YoutubeService) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes?.hasFocus?.currentValue === true) {
+      this.cardElement?.nativeElement?.scrollIntoView({behavior: 'smooth', block: 'center'})
+    }
+  }
 
   getDialogControl(control: string): FormControl {
     return this.dialogGroup.get(control) as FormControl

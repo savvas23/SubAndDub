@@ -20,12 +20,12 @@
                 <h3>No videos found, click on the + button to get started!</h3>
             </div>
             <ng-template #videos>
-                <div class="video" *ngFor="let video of youtubeVideoDetails | filter: searchInput.value">
-                    <video-card *ngIf="youtubeVideoDetails" [videoId]="video.id"
+                <div class="video" *ngFor="let video of userVideos$ | async | filter: searchInput.value">
+                    <video-card *ngIf="youtubeVideoDetails" [videoId]="video.videoId"
                     (editVideoEmitter)="navigateToDetailsView($event)"
                     (deleteVideoEmitter)="deleteVideoPrompt($event)"
                     (videoIdEmitter)="previewVideo($event)"
-                    [videoDetails]="getVideoDetailsById(video.id)"></video-card>
+                    [videoDetails]="getVideoDetailsById(video.videoId)"></video-card>
                 </div>            
             </ng-template>            
         </div>

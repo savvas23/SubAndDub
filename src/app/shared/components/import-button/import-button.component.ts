@@ -10,14 +10,14 @@ export class ImportButtonComponent {
 
   public fileContent$ = new BehaviorSubject<string>(null);
   @Input() acceptedFiles: string;
-  @Output() fileContentEmit: EventEmitter<BehaviorSubject<string| ArrayBuffer>> = new EventEmitter<BehaviorSubject<string | ArrayBuffer>>(null);
+  @Output() fileContentEmit: EventEmitter<any> = new EventEmitter<any>();
 
   selectFile(event: Event): void {
     let file = (event.target as HTMLInputElement).files[0];
     this.readFile(file)
     .then((data: string | ArrayBuffer) => {
       this.fileContent$.next(data as string);
-      this.fileContentEmit.emit(this.fileContent$)
+      this.fileContentEmit.emit({data: this.fileContent$, format: file.name.split('.')[1]});
     });
   }
 
@@ -44,5 +44,4 @@ export class ImportButtonComponent {
       
     });
   }
-
 }

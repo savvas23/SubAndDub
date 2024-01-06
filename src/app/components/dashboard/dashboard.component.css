@@ -1,7 +1,7 @@
 .dashboard-wrapper {
     display:flex;
     flex-direction: column;
-    padding-top:100px;
+    padding-top:40px;
     padding-left:100px;
     padding-right:50px;
 }

@@ -1,7 +1,7 @@
 <mat-card [ngClass]="{'focused-box': hasFocus}">
-  <span class="header-assigment-ribbon" *ngIf="assignedPerson" [style.background]="assignedPerson.color"></span>
+  <span class="header-assigment-ribbon" *ngIf="assignedPerson" [style.background]="assignedPerson.color" #card></span>
     <mat-card-header>
-      <mat-card-title>Subtitle {{index + 1}}</mat-card-title>
+      <mat-card-title #cardElement>Subtitle {{index + 1}}</mat-card-title>
       <mat-icon class="estimation-icon" [matTooltip]="estimationTooltip">{{estimationIcon}}</mat-icon>
       <button mat-icon-button matTooltip="ChatGPT Helper"
         [matMenuTriggerFor]="translateMenu">

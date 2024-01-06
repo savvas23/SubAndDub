@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit,Output,ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit,Output,QueryList,ViewChild, ViewChildren } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable,skip,take, takeUntil, tap } from 'rxjs';
 import { DialogBox } from 'src/app/models/general/dialog-box.model';
@@ -22,6 +22,7 @@ import { OpenAIService } from 'src/app/services/open-ai.service';
 import { ConfirmationModalComponent } from 'src/app/components/dialog-modal/confirmation-modal/confirmation-modal.component';
 import { YoutubeService } from 'src/app/services/youtube.service';
 import { BatchDialogModalComponent } from 'src/app/components/dialog-modal/batch-dialog-modal/batch-dialog-modal.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'dialog-component',
@@ -49,6 +50,7 @@ export class DialogComponentComponent implements OnInit {
   @Output() navigateTTS: EventEmitter<any> = new EventEmitter<any>();
   @Output() captionsPreviewDispatch: EventEmitter<string> = new EventEmitter<string>();
   @ViewChild('translateMenu') translateMenu;
+  @ViewChildren('scrollContainer') scrollContainer: QueryList<any>;
 
   public dialogBoxes: DialogBox[] = [{
     id: 1,
@@ -68,7 +70,8 @@ export class DialogComponentComponent implements OnInit {
     public dialog: MatDialog,
     private ttsService: TextToSpeechService,
     private openai: OpenAIService,
-    private youtube: YoutubeService
+    private youtube: YoutubeService,
+    private snackbar: MatSnackBar,
     ) {}
 
   ngOnInit(): void {
@@ -76,8 +79,8 @@ export class DialogComponentComponent implements OnInit {
       this.storage.getSubtitleURL(this.videoId, this.isoCode, this.subtitleName).pipe(take(1)).subscribe(url => {
         if (url) {
           this.storage.fetchSubtitleFile(url).subscribe((res: string) => {
-            this.subtitles$.next(res)
-            this.handleFileUpload(this.subtitles$);
+            this.subtitles$.next(res);
+            this.handleFileUpload({data: this.subtitles$, format: 'sbv'});
           })
         }
       });
@@ -86,8 +89,8 @@ export class DialogComponentComponent implements OnInit {
     this.form = this.fb.group({
       '1-dialogBox': this.fb.group({
         subtitles: this.fb.control(''),
-        start_time: this.fb.control('00:00.00'),
-        end_time: this.fb.control('00:02.00'),
+        start_time: this.fb.control('00:00.000'),
+        end_time: this.fb.control('00:02.000'),
         })
     });
 
@@ -119,7 +122,6 @@ export class DialogComponentComponent implements OnInit {
   }
 
   setFocusToDialogBoxItem(dialogBoxItemId: number) {
-    // Replace this with your actual implementation to set focus
     this.focusedDialogBox = dialogBoxItemId;
   }
 
@@ -211,7 +213,7 @@ export class DialogComponentComponent implements OnInit {
       const targetControlString = prevControl[prevControlIndex].toString(); // get the string value of the name of last element of the form controls
       return this.form?.get(targetControlString)?.get('end_time')?.value as string;
     } else {
-      return '00:00.00';
+      return '00:00.000';
     }
   }
 
@@ -220,19 +222,23 @@ export class DialogComponentComponent implements OnInit {
       const prevControlIndex = Object.keys(this.form.controls).length - 1;
       const prevControl = Object.keys(this.form.controls);
       const targetControlString = prevControl[prevControlIndex].toString();
-      const prevEndTime = this.form?.get(targetControlString)?.get('end_time')?.value as string; // // get the string value of the name of last element of the form controls
-      const prevEndTimeSplit = prevEndTime.split(':');
-      let lastElement = parseInt(prevEndTimeSplit[1]); // Convert the last element to a number
-      lastElement += 2; // Increase the last element by 2
-      prevEndTimeSplit[1] = lastElement.toString(); //
-  
-      if (prevEndTimeSplit[1].length === 1) { //check if its 1 digit number and '0' infront to conform with time format
-        prevEndTimeSplit[1] = '0' + prevEndTimeSplit[1];
+      const prevEndTime = this.form?.get(targetControlString)?.get('end_time')?.value as string;
+    
+      const [prevTime, prevMilliseconds] = prevEndTime.split('.');
+      const [minutes, seconds] = prevTime.split(':');
+    
+      let newSeconds = parseInt(seconds) + 2;
+      let newMinutes = parseInt(minutes);
+    
+      if (newSeconds >= 60) {
+        newMinutes += Math.floor(newSeconds / 60);
+        newSeconds %= 60;
       }
-      return prevEndTimeSplit.join(':') + '.000'; //change at a later stage to calculate actual miliseconds from previous value
-
+    
+      const newEndTime = `${newMinutes.toString().padStart(2, '0')}:${newSeconds.toString().padStart(2, '0')}.${prevMilliseconds}`;
+      return newEndTime;
     } else {
-        return '00:02.00';
+      return '00:02.000';
     }
   }
 
@@ -274,7 +280,6 @@ export class DialogComponentComponent implements OnInit {
   }
 
   endTimeValidation(nextGroup: FormGroup, currentGroup: FormGroup, startTimestampFormatted: TimeFormat, endTimestampFormatted: TimeFormat): void {
-    console.log(calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted))
     if (calculateSeconds(startTimestampFormatted) > calculateSeconds(endTimestampFormatted)) {
       currentGroup.get('end_time').setErrors({higherStartTime:true});
     } else {
@@ -386,7 +391,7 @@ getSecondsFromTime(time: string): number {
     let sbvContent = ''
     Object.keys(this.form.controls).forEach((control) => {
       const currentGroup = this.form.get(control);
-      sbvContent += `${currentGroup.get('start_time').value},${currentGroup.get('end_time').value}\n${currentGroup.get('subtitles').value}\n\n`;
+      sbvContent += `${'00:'+ currentGroup.get('start_time').value},${'00:' + currentGroup.get('end_time').value}\n${currentGroup.get('subtitles').value}\n\n`;
     });
     const blob = new Blob([sbvContent], { type: 'text/sbv;charset=utf8'});
     return blob;
@@ -404,19 +409,32 @@ getSecondsFromTime(time: string): number {
     document.body.removeChild(a);
   }
 
-  handleFileUpload(event: BehaviorSubject<string | ArrayBuffer>): void {
-    let fileContent = event.value as string;
-    let cleanArray = this.fileService.cleanMultilineString(fileContent);
-    // clear all controls, to rebuild form
-    Object.keys(this.form.controls).forEach(control=> {
-      this.form.removeControl(control);
-    });
+  handleFileUpload(event): void {
+    let fileContent = event.data.value as string;
+    let cleanArray = [];
+    switch (event.format) {
+      case ('sbv'):
+        cleanArray = this.fileService.cleanMultilineString(fileContent);
+        break;
+      case ('txt'):
+        cleanArray = this.fileService.youtubeTranscriptParse(fileContent);
+        break;
+      default:
+        this.snackbar.open('Format not supported!','DISMISS', {duration:5000});
+    }
 
-    this.dialogBoxes = [];
-    this.dialogBoxId = 0;
+    if (cleanArray.length) {
+      // clear all controls, to rebuild form
+      Object.keys(this.form.controls).forEach(control=> {
+        this.form.removeControl(control);
+      });
 
-    for (let individualSub of cleanArray) {
-      this.addDialogBox(individualSub);
+      this.dialogBoxes = [];
+      this.dialogBoxId = 0;
+
+      for (let individualSub of cleanArray) {
+        this.addDialogBox(individualSub);
+      }
     }
   }
 

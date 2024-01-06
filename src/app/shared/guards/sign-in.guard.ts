@@ -11,7 +11,6 @@ export class SignInGuard implements CanActivate {
   constructor(private auth: AuthService,private router: Router){}
 
   canActivate(): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    console.log(this.auth.isLoggedIn)
     if (this.auth.isLoggedIn) {
       this.router.navigate(['dashboard'])
       return false;

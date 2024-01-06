@@ -59,7 +59,6 @@ export class StorageService {
     }
 
     uploadToFirestorageCommunitySub(pathRef: AngularFireStorageReference, subtitle: Blob, user: GmailUser, requestId: string, requestDetails: CommunityHelpRequest): void {
-        console.log(requestDetails)
         pathRef.put(subtitle).then(() => {
             //update firestore record of user with a new notification about the subtitle
             const subRef: AngularFirestoreDocument = this.firestore.doc(`users/${requestDetails.requestedByID}/notifications/${requestId}/subtitles/${user.uid}`);

@@ -9,10 +9,8 @@ import { YoutubeVideoDetails } from 'src/app/models/youtube/youtube-response.mod
 export class VideoCardComponent implements OnInit {
   @Input() videoId: string
   @Input() videoDetails: YoutubeVideoDetails;
-  @Input() showActions: boolean = true;
   @Output() editVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
   @Output() deleteVideoEmitter: EventEmitter<string> = new EventEmitter<string>;
-  @Output() requestCommunityHelpEmitter: EventEmitter<string> = new EventEmitter<string>;
   @Output() videoIdEmitter: EventEmitter<string> = new EventEmitter<string>;
 
 
@@ -21,7 +19,7 @@ export class VideoCardComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.publishDate = this.timeSince(new Date(this.videoDetails?.snippet?.publishedAt));
+    this.publishDate = timeSince(new Date(this.videoDetails?.snippet?.publishedAt));
   }
 
   editVideo(id: string): void {
@@ -32,41 +30,36 @@ export class VideoCardComponent implements OnInit {
     this.deleteVideoEmitter.emit(id);
   }
 
-  requestCommunityHelp(id: string): void {
-    this.requestCommunityHelpEmitter.emit(id);
-  }
-
   emitVideoId(id: string): void {
     this.videoIdEmitter.emit(id);
-  }
-
-  timeSince(date: Date): string {
-
-    let seconds = Math.floor((new Date().valueOf() - date.valueOf()) / 1000);
-  
-    let interval = seconds / 31536000;
-  
-    if (interval > 1) {
-      return Math.floor(interval) + " years";
-    }
-    interval = seconds / 2592000;
-    if (interval > 1) {
-      return Math.floor(interval) + " months";
-    }
-    interval = seconds / 86400;
-    if (interval > 1) {
-      return Math.floor(interval) + " days";
-    }
-    interval = seconds / 3600;
-    if (interval > 1) {
-      return Math.floor(interval) + " hours";
-    }
-    interval = seconds / 60;
-    if (interval > 1) {
-      return Math.floor(interval) + " minutes";
-    }
-    return Math.floor(seconds) + " seconds";
   }
 }
 
 
+export function timeSince(date: Date): string {
+
+  let seconds = Math.floor((new Date().valueOf() - date.valueOf()) / 1000);
+
+  let interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " years";
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " months";
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " days";
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " hours";
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " minutes";
+  }
+  return Math.floor(seconds) + " seconds";
+}
