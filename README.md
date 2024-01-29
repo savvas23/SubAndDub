@@ -4,7 +4,7 @@ A helping platform to assist you with creating Subtitles for Youtube Videos, alo
 
 ## Required Configuration
 
-To run this locally you will need a Firestore configuration for a schema and Storage bucket. If you want to utilize ChatGPT in subtitling you will need a valid API Key. Make sure to save these in your enviroment files.
+To run this locally you will need a Firestore configuration for a schema and Storage bucket. If you want to utilize ChatGPT in subtitling you will need a valid API Key. Make sure to save these in your enviroment files and import them in the corresponding services to be used.
 
 ## Development server
 
